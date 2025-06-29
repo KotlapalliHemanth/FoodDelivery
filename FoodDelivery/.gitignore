@@ -45,3 +45,6 @@ Thumbs.db
 # Editor/OS backups
 *~
 *.swp
+
+# Java class files
+*.class
