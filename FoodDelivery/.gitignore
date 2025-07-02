@@ -48,3 +48,4 @@ Thumbs.db
 
 # Java class files
 *.class
+FoodDelivery/src/main/resources/application.properties

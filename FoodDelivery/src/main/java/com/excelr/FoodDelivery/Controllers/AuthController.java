@@ -1,22 +1,28 @@
 package com.excelr.FoodDelivery.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.excelr.FoodDelivery.Models.Admin;
+import com.excelr.FoodDelivery.Models.Customer;
+import com.excelr.FoodDelivery.Models.DeliveryPartner;
+import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Repositories.AdminRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.DeliveryPartnerRepository;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
-import com.excelr.FoodDelivery.Models.Customer;
-import com.excelr.FoodDelivery.Models.Admin;
-import com.excelr.FoodDelivery.Models.Restaurant;
-import com.excelr.FoodDelivery.Models.DeliveryPartner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RestController
 @RequestMapping("/auth")
@@ -101,27 +107,30 @@ public class AuthController {
 
     @GetMapping("/oauth2/success")
     public ResponseEntity<?> oauth2Success(Authentication authentication) {
-        String email = authentication.getName();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+        }
+        String username = authentication.getName();
         Object user = null;
         String role = null;
 
-        if (customerRepo.findByUsernameOrEmailOrPhone(email).isPresent()) {
-            user = customerRepo.findByUsernameOrEmailOrPhone(email).get();
+        if (customerRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
+            user = customerRepo.findByUsernameOrEmailOrPhone(username).get();
             role = "CUSTOMER";
-        } else if (deliveryRepo.findByUsernameOrEmailOrPhone(email).isPresent()) {
-            user = deliveryRepo.findByUsernameOrEmailOrPhone(email).get();
+        } else if (deliveryRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
+            user = deliveryRepo.findByUsernameOrEmailOrPhone(username).get();
             role = "RIDER";
-        } else if (restaurantRepo.findByUsernameOrEmailOrPhone(email).isPresent()) {
-            user = restaurantRepo.findByUsernameOrEmailOrPhone(email).get();
+        } else if (restaurantRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
+            user = restaurantRepo.findByUsernameOrEmailOrPhone(username).get();
             role = "RESTAURANT";
-        } else if (adminRepo.findByUsernameOrEmailOrPhone(email).isPresent()) {
-            user = adminRepo.findByUsernameOrEmailOrPhone(email).get();
+        } else if (adminRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
+            user = adminRepo.findByUsernameOrEmailOrPhone(username).get();
             role = "ADMIN";
         } else {
             // Default: register as CUSTOMER if not found
             Customer c = new Customer();
-            c.setUsername(email);
-            c.setEmail(email);
+            c.setUsername(username);
+            c.setEmail(username);
             c.setPassword(""); // No password for OAuth
             c.setPhone("");
             customerRepo.save(c);
