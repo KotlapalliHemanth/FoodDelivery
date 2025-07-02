@@ -7,6 +7,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,10 @@ import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.DeliveryPartnerRepository;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/auth")
@@ -106,14 +112,42 @@ public class AuthController {
     }
 
     @GetMapping("/oauth2/success")
-    public ResponseEntity<?> oauth2Success(Authentication authentication) {
+    public ResponseEntity<?> oauth2Success(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+        HttpSessionOAuth2AuthorizationRequestRepository repo = new HttpSessionOAuth2AuthorizationRequestRepository();
+        OAuth2AuthorizationRequest authRequest = repo.removeAuthorizationRequest(request, response);
+
+        String userType = null;
+        if (authRequest != null && authRequest.getAdditionalParameters() != null) {
+            userType = (String) authRequest.getAdditionalParameters().get("userType");
+        }
+        if (userType == null) {
+            userType = (String) request.getSession().getAttribute("OAUTH2_USER_TYPE");
+        }
+        System.out.println("User type from OAuth2 flow: " + userType);
+
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
         }
-        String username = authentication.getName();
+
+        // Extract Google user info
+        String email = null, name = null, picture = null, googleId = null;
+        if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser oidcUser) {
+            email = oidcUser.getAttribute("email");
+            name = oidcUser.getAttribute("name");
+            picture = oidcUser.getAttribute("picture");
+            googleId = oidcUser.getAttribute("sub");
+        } else if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User oauth2User) {
+            email = oauth2User.getAttribute("email");
+            name = oauth2User.getAttribute("name");
+            picture = oauth2User.getAttribute("picture");
+            googleId = oauth2User.getAttribute("sub");
+        }
+        String username = email != null ? email : (name != null ? name : googleId);
+
         Object user = null;
         String role = null;
 
+        // Try to find user in all repos
         if (customerRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
             user = customerRepo.findByUsernameOrEmailOrPhone(username).get();
             role = "CUSTOMER";
@@ -127,15 +161,70 @@ public class AuthController {
             user = adminRepo.findByUsernameOrEmailOrPhone(username).get();
             role = "ADMIN";
         } else {
-            // Default: register as CUSTOMER if not found
-            Customer c = new Customer();
-            c.setUsername(username);
-            c.setEmail(username);
-            c.setPassword(""); // No password for OAuth
-            c.setPhone("");
-            customerRepo.save(c);
-            user = c;
-            role = "CUSTOMER";
+            // Register in the correct table based on userType
+            switch (userType != null ? userType.toUpperCase() : "") {
+                case "CUSTOMER" -> {
+                    Customer c = new Customer();
+                    c.setUsername(name != null ? name : username);
+                    c.setEmail(email);
+                    c.setPassword(""); // No password for OAuth
+                    c.setPhone(""); // Not provided by Google
+                    c.setProfilePic(picture);
+                    c.setGoogleId(googleId);
+                    customerRepo.save(c);
+                    user = c;
+                    role = "CUSTOMER";
+                }
+                case "RIDER", "DELIVERYPARTNER" -> {
+                    DeliveryPartner d = new DeliveryPartner();
+                    d.setUsername(name != null ? name : username);
+                    d.setEmail(email);
+                    d.setPassword("");
+                    d.setPhone("");
+                    d.setProfilePic(picture);
+                    d.setGoogleId(googleId);
+                    deliveryRepo.save(d);
+                    user = d;
+                    role = "RIDER";
+                }
+                case "RESTAURANT" -> {
+                    Restaurant r = new Restaurant();
+                    r.setUsername(name != null ? name : username);
+                    r.setEmail(email);
+                    r.setPassword("");
+                    r.setPhone("");
+                    r.setProfilePic(picture);
+                    r.setGoogleId(googleId);
+                    restaurantRepo.save(r);
+                    user = r;
+                    role = "RESTAURANT";
+                }
+                case "ADMIN" -> {
+                    Admin a = new Admin();
+                    a.setUsername(name != null ? name : username);
+                    a.setEmail(email);
+                    a.setPassword("");
+                    a.setPhone("");
+                    a.setProfilePic(picture);
+                    a.setGoogleId(googleId);
+                    adminRepo.save(a);
+                    user = a;
+                    role = "ADMIN";
+                }
+                default -> {
+                    // Fallback: register as CUSTOMER
+                    Customer c = new Customer();
+                    c.setUsername(name != null ? name : username);
+                    c.setEmail(email);
+                    c.setPassword("");
+                    c.setPhone("");
+                    c.setProfilePic(picture);
+                    c.setGoogleId(googleId);
+                    customerRepo.save(c);
+                    user = c;
+                    role = "CUSTOMER";
+                }
+            }
         }
 
         String jwt = jwtUtil.generateAccessTokken(user, role);
