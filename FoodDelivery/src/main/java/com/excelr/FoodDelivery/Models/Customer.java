@@ -26,11 +26,14 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String firstName;   // Add this
+    private String lastName;    // Add this
     private String username;
     private String email;
     private String phone;
     private String password;
-    private String profilePic;
+    private String profilePic; // image URL (Cloudinary or Google)
+    private String profilePicPublicId; // Cloudinary public_id, null if Google
     private String googleId;
     private Boolean isEnabled = true;
     private LocalDateTime createdAt = LocalDateTime.now();

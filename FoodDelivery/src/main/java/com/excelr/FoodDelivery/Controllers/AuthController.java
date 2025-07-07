@@ -85,26 +85,43 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+        if (req.userType == null) {
+            return ResponseEntity.badRequest().body("userType is required");
+        }
+
         Authentication auth = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(req.username, req.password));
 
-        // Try to find user in each repo using the unified method
         String role = null;
         Object user = null;
-        if (customerRepo.findByUsernameOrEmailOrPhone(req.username).isPresent()) {
-            user = customerRepo.findByUsernameOrEmailOrPhone(req.username).get();
-            role = "CUSTOMER";
-        } else if (deliveryRepo.findByUsernameOrEmailOrPhone(req.username).isPresent()) {
-            user = deliveryRepo.findByUsernameOrEmailOrPhone(req.username).get();
-            role = "RIDER";
-        } else if (restaurantRepo.findByUsernameOrEmailOrPhone(req.username).isPresent()) {
-            user = restaurantRepo.findByUsernameOrEmailOrPhone(req.username).get();
-            role = "RESTAURANT";
-        } else if (adminRepo.findByUsernameOrEmailOrPhone(req.username).isPresent()) {
-            user = adminRepo.findByUsernameOrEmailOrPhone(req.username).get();
-            role = "ADMIN";
-        } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
+        switch (req.userType.toUpperCase()) {
+            case "CUSTOMER" -> {
+                var opt = customerRepo.findByUsernameOrEmailOrPhone(req.username);
+                if (opt.isEmpty()) return ResponseEntity.status(401).body("Invalid credentials");
+                user = opt.get();
+                role = "CUSTOMER";
+            }
+            case "RIDER", "DELIVERYPARTNER" -> {
+                var opt = deliveryRepo.findByUsernameOrEmailOrPhone(req.username);
+                if (opt.isEmpty()) return ResponseEntity.status(401).body("Invalid credentials");
+                user = opt.get();
+                role = "RIDER";
+            }
+            case "RESTAURANT" -> {
+                var opt = restaurantRepo.findByUsernameOrEmailOrPhone(req.username);
+                if (opt.isEmpty()) return ResponseEntity.status(401).body("Invalid credentials");
+                user = opt.get();
+                role = "RESTAURANT";
+            }
+            case "ADMIN" -> {
+                var opt = adminRepo.findByUsernameOrEmailOrPhone(req.username);
+                if (opt.isEmpty()) return ResponseEntity.status(401).body("Invalid credentials");
+                user = opt.get();
+                role = "ADMIN";
+            }
+            default -> {
+                return ResponseEntity.badRequest().body("Invalid userType");
+            }
         }
 
         String jwt = jwtUtil.generateAccessTokken(user, role);
@@ -130,52 +147,63 @@ public class AuthController {
         }
 
         // Extract Google user info
-        String email = null, name = null, picture = null, googleId = null;
+        String email = null, name = null, picture = null, googleId = null, firstName = null, lastName = null;
         if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser oidcUser) {
             email = oidcUser.getAttribute("email");
             name = oidcUser.getAttribute("name");
             picture = oidcUser.getAttribute("picture");
             googleId = oidcUser.getAttribute("sub");
+            firstName = oidcUser.getAttribute("given_name");
+            lastName = oidcUser.getAttribute("family_name");
         } else if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User oauth2User) {
             email = oauth2User.getAttribute("email");
             name = oauth2User.getAttribute("name");
             picture = oauth2User.getAttribute("picture");
             googleId = oauth2User.getAttribute("sub");
+            firstName = oauth2User.getAttribute("given_name");
+            lastName = oauth2User.getAttribute("family_name");
         }
+
+        // Fallback: If firstName or lastName is null, try to split the name
+        if ((firstName == null || lastName == null) && name != null) {
+            String[] parts = name.trim().split(" ", 2);
+            firstName = (firstName == null && parts.length > 0) ? parts[0] : firstName;
+            lastName = (lastName == null && parts.length > 1) ? parts[1] : lastName;
+        }
+
         String username = email != null ? email : (name != null ? name : googleId);
 
         Object user = null;
         String role = null;
 
-        // Try to find user in all repos
-        if (customerRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
-            user = customerRepo.findByUsernameOrEmailOrPhone(username).get();
-            role = "CUSTOMER";
-        } else if (deliveryRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
-            user = deliveryRepo.findByUsernameOrEmailOrPhone(username).get();
-            role = "RIDER";
-        } else if (restaurantRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
-            user = restaurantRepo.findByUsernameOrEmailOrPhone(username).get();
-            role = "RESTAURANT";
-        } else if (adminRepo.findByUsernameOrEmailOrPhone(username).isPresent()) {
-            user = adminRepo.findByUsernameOrEmailOrPhone(username).get();
-            role = "ADMIN";
-        } else {
-            // Register in the correct table based on userType
-            switch (userType != null ? userType.toUpperCase() : "") {
-                case "CUSTOMER" -> {
+        switch (userType != null ? userType.toUpperCase() : "") {
+            case "CUSTOMER" -> {
+                var opt = customerRepo.findByUsernameOrEmailOrPhone(username);
+                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
+                    user = opt.get();
+                    role = "CUSTOMER";
+                } else {
                     Customer c = new Customer();
                     c.setUsername(name != null ? name : username);
+                    c.setFirstName(firstName);
+                    c.setLastName(lastName);
                     c.setEmail(email);
                     c.setPassword(""); // No password for OAuth
                     c.setPhone(""); // Not provided by Google
                     c.setProfilePic(picture);
                     c.setGoogleId(googleId);
+                    c.setIsEnabled(true);
                     customerRepo.save(c);
                     user = c;
                     role = "CUSTOMER";
                 }
-                case "RIDER", "DELIVERYPARTNER" -> {
+            }
+            case "RIDER", "DELIVERYPARTNER" -> {
+                var opt = deliveryRepo.findByUsernameOrEmailOrPhone(username);
+                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
+                    user = opt.get();
+                    role = "RIDER";
+                } else {
                     DeliveryPartner d = new DeliveryPartner();
                     d.setUsername(name != null ? name : username);
                     d.setEmail(email);
@@ -183,11 +211,18 @@ public class AuthController {
                     d.setPhone("");
                     d.setProfilePic(picture);
                     d.setGoogleId(googleId);
+                    d.setIsEnabled(true);
                     deliveryRepo.save(d);
                     user = d;
                     role = "RIDER";
                 }
-                case "RESTAURANT" -> {
+            }
+            case "RESTAURANT" -> {
+                var opt = restaurantRepo.findByUsernameOrEmailOrPhone(username);
+                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
+                    user = opt.get();
+                    role = "RESTAURANT";
+                } else {
                     Restaurant r = new Restaurant();
                     r.setUsername(name != null ? name : username);
                     r.setEmail(email);
@@ -195,11 +230,18 @@ public class AuthController {
                     r.setPhone("");
                     r.setProfilePic(picture);
                     r.setGoogleId(googleId);
+                    r.setIsEnabled(true);
                     restaurantRepo.save(r);
                     user = r;
                     role = "RESTAURANT";
                 }
-                case "ADMIN" -> {
+            }
+            case "ADMIN" -> {
+                var opt = adminRepo.findByUsernameOrEmailOrPhone(username);
+                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
+                    user = opt.get();
+                    role = "ADMIN";
+                } else {
                     Admin a = new Admin();
                     a.setUsername(name != null ? name : username);
                     a.setEmail(email);
@@ -207,23 +249,14 @@ public class AuthController {
                     a.setPhone("");
                     a.setProfilePic(picture);
                     a.setGoogleId(googleId);
+                    a.setIsEnabled(true);
                     adminRepo.save(a);
                     user = a;
                     role = "ADMIN";
                 }
-                default -> {
-                    // Fallback: register as CUSTOMER
-                    Customer c = new Customer();
-                    c.setUsername(name != null ? name : username);
-                    c.setEmail(email);
-                    c.setPassword("");
-                    c.setPhone("");
-                    c.setProfilePic(picture);
-                    c.setGoogleId(googleId);
-                    customerRepo.save(c);
-                    user = c;
-                    role = "CUSTOMER";
-                }
+            }
+            default -> {
+                return ResponseEntity.badRequest().body("Invalid userType");
             }
         }
 
@@ -233,5 +266,9 @@ public class AuthController {
 }
 
 class RegistrationRequest { public String username, email, password, phone; }
-class LoginRequest { public String username, password; }
+class LoginRequest {
+    public String username;
+    public String password;
+    public String userType; // Add this
+}
 class JwtResponse { public String token; public JwtResponse(String t) { token = t; } }
