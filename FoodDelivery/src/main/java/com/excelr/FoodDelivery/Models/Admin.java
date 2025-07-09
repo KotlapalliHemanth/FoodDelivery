@@ -12,10 +12,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "admins", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"email"}),
-    @UniqueConstraint(columnNames = {"phone"})
-})
+@Table(name = "admins")
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
