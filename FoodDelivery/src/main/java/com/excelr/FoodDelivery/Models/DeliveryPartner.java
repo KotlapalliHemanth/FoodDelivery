@@ -28,6 +28,7 @@ public class DeliveryPartner {
     private String phone;
     private String password;
     private String profilePic;
+     private String profilePicPublicId;
     private String googleId;
     private Boolean isEnabled = true;
     private LocalDateTime createdAt = LocalDateTime.now();

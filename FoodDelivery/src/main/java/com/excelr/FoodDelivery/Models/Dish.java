@@ -23,6 +23,7 @@ public class Dish {
 
     private String name;
     private String image;
+    private String imagePublicId;
     private Double price;
     private String description;
 }

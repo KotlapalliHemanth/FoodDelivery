@@ -27,6 +27,9 @@ public class Address {
     private String pincode;
     private String country;
 
+    private Double latitude;
+    private Double longitude;
+
     @Enumerated(EnumType.STRING)
     private AddressOwnerType ownerType; // CUSTOMER or RESTAURANT
 
