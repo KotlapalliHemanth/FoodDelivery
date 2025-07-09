@@ -45,6 +45,16 @@ public class AuthController {
     public ResponseEntity<?> register(@PathVariable String role, @RequestBody RegistrationRequest req) {
         switch (role.toUpperCase()) {
             case "CUSTOMER" -> {
+                // Check if an active user with the given username, email, or phone already exists.
+                if (customerRepo.findEnabled(req.username).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active user with this username already exists.");
+                }
+                if (customerRepo.findEnabled(req.email).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active user with this email already exists.");
+                }
+                if (customerRepo.findEnabled(req.phone).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active user with this phone number already exists.");
+                }
                 Customer c = new Customer();
                 c.setUsername(req.username);
                 c.setEmail(req.email);
@@ -53,6 +63,15 @@ public class AuthController {
                 customerRepo.save(c);
             }
             case "DELIVERYPARTNER", "RIDER" -> {
+                if (deliveryRepo.findEnabled(req.username).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active delivery partner with this username already exists.");
+                }
+                if (deliveryRepo.findEnabled(req.email).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active delivery partner with this email already exists.");
+                }
+                if (deliveryRepo.findEnabled(req.phone).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active delivery partner with this phone number already exists.");
+                }
                 DeliveryPartner d = new DeliveryPartner();
                 d.setUsername(req.username);
                 d.setEmail(req.email);
@@ -61,6 +80,15 @@ public class AuthController {
                 deliveryRepo.save(d);
             }
             case "RESTAURANT" -> {
+                if (restaurantRepo.findEnabled(req.username).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active restaurant with this username already exists.");
+                }
+                if (restaurantRepo.findEnabled(req.email).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active restaurant with this email already exists.");
+                }
+                if (restaurantRepo.findEnabled(req.phone).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active restaurant with this phone number already exists.");
+                }
                 Restaurant r = new Restaurant();
                 r.setUsername(req.username);
                 r.setEmail(req.email);
@@ -69,6 +97,15 @@ public class AuthController {
                 restaurantRepo.save(r);
             }
             case "ADMIN" -> {
+                if (adminRepo.findEnabled(req.username).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active admin with this username already exists.");
+                }
+                if (adminRepo.findEnabled(req.email).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active admin with this email already exists.");
+                }
+                if (adminRepo.findEnabled(req.phone).isPresent()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("An active admin with this phone number already exists.");
+                }
                 Admin a = new Admin();
                 a.setUsername(req.username);
                 a.setEmail(req.email);
@@ -178,7 +215,7 @@ public class AuthController {
 
         switch (userType != null ? userType.toUpperCase() : "") {
             case "CUSTOMER" -> {
-                var opt = customerRepo.findByUsernameOrEmailOrPhone(username);
+                var opt = customerRepo.findEnabled(username);
                 if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
                     user = opt.get();
                     role = "CUSTOMER";
@@ -199,7 +236,7 @@ public class AuthController {
                 }
             }
             case "RIDER", "DELIVERYPARTNER" -> {
-                var opt = deliveryRepo.findByUsernameOrEmailOrPhone(username);
+                var opt = deliveryRepo.findEnabled(username);
                 if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
                     user = opt.get();
                     role = "RIDER";
@@ -218,7 +255,7 @@ public class AuthController {
                 }
             }
             case "RESTAURANT" -> {
-                var opt = restaurantRepo.findByUsernameOrEmailOrPhone(username);
+                var opt = restaurantRepo.findEnabled(username);
                 if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
                     user = opt.get();
                     role = "RESTAURANT";
@@ -237,7 +274,7 @@ public class AuthController {
                 }
             }
             case "ADMIN" -> {
-                var opt = adminRepo.findByUsernameOrEmailOrPhone(username);
+                var opt = adminRepo.findEnabled(username);
                 if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
                     user = opt.get();
                     role = "ADMIN";
