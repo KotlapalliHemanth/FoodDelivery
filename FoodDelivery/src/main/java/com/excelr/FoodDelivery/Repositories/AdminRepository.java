@@ -14,6 +14,6 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     Optional<Admin> findByUsernameOrEmailOrPhone(@Param("input") String input);
  
 
-    @Query("SELECT a FROM Admin a WHERE (a.username = :input OR a.email = :input OR a.phone = :input) AND a.enabled = true")
+    @Query("SELECT a FROM Admin a WHERE (a.username = :input OR a.email = :input OR a.phone = :input) AND a.isEnabled = true")
     Optional<Admin> findEnabled(@Param("input") String input);
 }

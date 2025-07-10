@@ -13,7 +13,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant,Long> {
     @Query("SELECT r FROM Restaurant r WHERE r.username = :input OR r.email = :input OR r.phone = :input")
     Optional<Restaurant> findByUsernameOrEmailOrPhone(@Param("input") String input);
 
-    @Query("SELECT r FROM Restaurant r WHERE (r.username = :input OR r.email = :input OR r.phone = :input) AND r.enabled = true")
+    @Query("SELECT r FROM Restaurant r WHERE (r.username = :input OR r.email = :input OR r.phone = :input) AND r.isEnabled = true")
     Optional<Restaurant> findEnabled(@Param("input") String input);
 
 }

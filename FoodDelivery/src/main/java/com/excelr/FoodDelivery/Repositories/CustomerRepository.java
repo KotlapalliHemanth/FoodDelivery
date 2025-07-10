@@ -14,6 +14,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByUsernameOrEmailOrPhone(@Param("input") String input);
     
     
-    @Query("SELECT c FROM Customer c WHERE (c.username = :input OR c.email = :input OR c.phone = :input) AND c.enabled = true")
+    @Query("SELECT c FROM Customer c WHERE (c.username = :input OR c.email = :input OR c.phone = :input) AND c.isEnabled = true")
     Optional<Customer> findEnabled(@Param("input") String input);
 }

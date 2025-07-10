@@ -48,9 +48,18 @@ public class CustomerController {
         Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        customer = customerService.updateCustomerDetails(customer, update, profilePic);
-
-        customer.setOrders(List.of());
+        if(update==null && profilePic==null) {
+        	customer.setPassword(" ");
+        	customer.setOrders(List.of());
+        	System.out.println(customer);
+        }
+        if(update!=null || profilePic!=null) {
+        	customer = customerService.updateCustomerDetails(customer, update, profilePic);
+            customer.setOrders(List.of());
+            customer.setPassword(" ");
+            System.out.println(customer);
+            
+        }
         return ResponseEntity.ok(customer);
     }
 
