@@ -10,17 +10,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-
 import lombok.Data;
 
 
 @Data
 @Entity
-@Table(name = "customers", uniqueConstraints = {
-//    @UniqueConstraint(columnNames = {"email"}),
-//    @UniqueConstraint(columnNames = {"phone"})
-})
+@Table(name = "customers")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

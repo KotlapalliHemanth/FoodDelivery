@@ -16,10 +16,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "restaurants", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"email"}),
-    @UniqueConstraint(columnNames = {"phone"})
-})
+@Table(name = "restaurants")
 public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
