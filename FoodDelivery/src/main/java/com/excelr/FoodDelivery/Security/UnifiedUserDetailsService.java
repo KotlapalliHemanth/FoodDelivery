@@ -31,19 +31,19 @@ public class UnifiedUserDetailsService implements UserDetailsService {
         if (entity instanceof Customer c) {
             username = c.getEmail();
             password = c.getPassword();
-            enabled = c.getIsEnabled();
+            enabled = c.getEnabled();
         } else if (entity instanceof DeliveryPartner d) {
             username = d.getEmail();
             password = d.getPassword();
-            enabled = d.getIsEnabled();
+            enabled = d.getEnabled();
         } else if (entity instanceof Restaurant r) {
             username = r.getEmail();
             password = r.getPassword();
-            enabled = r.getIsEnabled();
+            enabled = r.getEnabled();
         } else if (entity instanceof Admin a) {
             username = a.getEmail();
             password = a.getPassword();
-            enabled = a.getIsEnabled();
+            enabled = a.getEnabled();
         } else {
             throw new IllegalArgumentException("Unknown user type");
         }

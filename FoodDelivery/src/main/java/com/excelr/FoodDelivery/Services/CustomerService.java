@@ -10,6 +10,7 @@ import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Order;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
+import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.DishRepository;
 import com.excelr.FoodDelivery.Repositories.OrderRepository;
@@ -31,7 +32,7 @@ public class CustomerService {
 	@Autowired
 	private CloudinaryUtil cloudinaryUtil;
 
-	public Customer updateCustomerDetails(Customer customer, Customer update, MultipartFile newProfilePic) throws Exception {
+	public CustomerDetailsDTO updateCustomerDetails(Customer customer, Customer update, MultipartFile newProfilePic) throws Exception {
         // Only update fields if provided (not null), except addresses and password
 
         // Handle profile pic replacement
@@ -50,10 +51,13 @@ public class CustomerService {
         if (update.getUsername() != null) customer.setUsername(update.getUsername());
         if (update.getEmail() != null) customer.setEmail(update.getEmail());
         if (update.getPhone() != null) customer.setPhone(update.getPhone());
-        if (update.getIsEnabled() != null) customer.setIsEnabled(update.getIsEnabled());
+        if (update.getEnabled() != null) customer.setEnabled(update.getEnabled());
         // Do NOT update addresses or password here
 
-        return customerRepo.save(customer);
+        Customer c= customerRepo.save(customer);
+        
+        return new CustomerDetailsDTO(c);
+        
     }
 
     
