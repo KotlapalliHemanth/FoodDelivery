@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.excelr.FoodDelivery.Models.Address;
 import com.excelr.FoodDelivery.Models.Customer;
-import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.Enum.AddressOwnerType;
+import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Repositories.AddressRepository;
 
 
