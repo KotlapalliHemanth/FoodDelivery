@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,8 +25,10 @@ import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
+import com.excelr.FoodDelivery.Repositories.AddressRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
+import com.excelr.FoodDelivery.Services.AddressService;
 import com.excelr.FoodDelivery.Services.CustomerService;
 import com.excelr.FoodDelivery.Services.OrderService;
 
@@ -36,6 +39,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerRepository customerRepo;
+    
+    @Autowired
+    private AddressService addressService;
 
     @Autowired
     private CustomerService customerService;
@@ -122,8 +128,25 @@ public class CustomerController {
     
     @GetMapping("/address")
     public ResponseEntity<?> addAddress(Authentication authentication, @RequestBody AddressDTO a){
-    	return ResponseEntity.ok("ok");
+    	String email = authentication.getName();
+        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        
+        return ResponseEntity.ok(addressService.createCustomerAddress(customer, a));
     }
+    
+    @PutMapping("/address")
+    public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	
+    	return ResponseEntity.ok(addressService.modifyAddress( a));
+    }
+    
+    @DeleteMapping("/address")
+    public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	addressService.deleteAddress(a);
+    	return ResponseEntity.ok("deleted");
+    }
+    	 
     
     
     //password change------------------------
