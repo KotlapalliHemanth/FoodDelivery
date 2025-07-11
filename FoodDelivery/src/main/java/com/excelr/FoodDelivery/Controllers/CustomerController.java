@@ -3,10 +3,12 @@ package com.excelr.FoodDelivery.Controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,10 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Order;
+import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
+import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
 import com.excelr.FoodDelivery.Services.CustomerService;
 import com.excelr.FoodDelivery.Services.OrderService;
 
@@ -38,13 +42,19 @@ public class CustomerController {
     
     @Autowired
     private OrderService orderService;
+    
+    @Autowired 
+    PasswordEncoder passwordEncoder;
+    
+    @Autowired 
+    JwtUtill jwtUtil;
 
     
 //  api for  details
     @PostMapping(value = "/details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CustomerDetailsDTO> getAndUpdateUserProfile(
             Authentication authentication,
-            @RequestPart(required = false) Customer update,
+            @RequestPart(required = false) CustomerDetailsDTO update,
             @RequestPart(required = false) MultipartFile profilePic) throws Exception {
 
     	String email = authentication.getName();
@@ -52,14 +62,12 @@ public class CustomerController {
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         CustomerDetailsDTO d = null;
-        if(update==null && profilePic==null) {
+        if(update==null && profilePic==null) { //details not provided(used got getting details)
         	 d = new CustomerDetailsDTO(customer);
         	System.out.println(d);
         }
-        if(update!=null || profilePic!=null) {
+        if(update!=null || profilePic!=null) { //details provided for updating details
         	 d = customerService.updateCustomerDetails(customer, update, profilePic);
-            
-           
             System.out.println(customer);
             
         }
@@ -112,10 +120,35 @@ public class CustomerController {
     
     // curd operations on address------------------------
     
+    @GetMapping("/address")
+    public ResponseEntity<?> addAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	return ResponseEntity.ok("ok");
+    }
+    
     
     //password change------------------------
-    
+    @PutMapping("/password")
+    public ResponseEntity<?> changePassword(Authentication authentication, @RequestBody PasswordReqBody passwordReqBody){
+    	String email = authentication.getName();
+        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        
+        if(passwordEncoder.matches(passwordReqBody.oldPassword, customer.getPassword())) {
+        	customer.setPassword(passwordEncoder.encode(passwordReqBody.newPassword));
+        	customerRepo.save(customer);
+        }else {
+        	return ResponseEntity.status(HttpStatus.CONFLICT).body("wrong password. Please try again");
+        }
+        
+        String jwt = jwtUtil.generateAccessTokken(customer, "CUSTOMER");
+        return ResponseEntity.ok(new JwtResponse(jwt));
+    	
+    }
     
     //others-----------------
     
+    
+    
+    //request bodies 
+    class PasswordReqBody { public String oldPassword, newPassword; }
 }

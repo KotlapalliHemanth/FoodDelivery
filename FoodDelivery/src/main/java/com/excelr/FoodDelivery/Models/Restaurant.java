@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
@@ -38,6 +39,6 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant")
     private List<Dish> dishes;
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<Address> addresses;
 }
