@@ -70,7 +70,7 @@ public class AddressService {
 	
 	}
 	
-	public List<Address> getAddresses (String role, Long id) {
+	public List<Address> getAddresses ( Long id) {
 		return  addressRepo.findByOwnerId(id);
 	}
 	
