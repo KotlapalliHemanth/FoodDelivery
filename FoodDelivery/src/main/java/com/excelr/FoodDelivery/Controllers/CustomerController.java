@@ -126,7 +126,7 @@ public class CustomerController {
     
     // curd operations on address------------------------
     
-    @GetMapping("/address")
+    @PostMapping("/address")
     public ResponseEntity<?> addAddress(Authentication authentication, @RequestBody AddressDTO a){
     	String email = authentication.getName();
         Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
@@ -146,6 +146,14 @@ public class CustomerController {
     	addressService.deleteAddress(a);
     	return ResponseEntity.ok("deleted");
     }
+    
+    @GetMapping("/address")
+    public ResponseEntity<?> getAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	
+    	return ResponseEntity.ok(addressService.getAddresses(a.getId()));
+    }
+    
+    
     	 
     
     
