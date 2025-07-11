@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,7 +31,9 @@ public class Customer {
     private String profilePic; // image URL (Cloudinary or Google)
     private String profilePicPublicId; // Cloudinary public_id, null if Google
     private String googleId;
-    private Boolean isEnabled = true;
+    
+   
+    private Boolean enabled = true;
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "customer")

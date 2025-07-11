@@ -135,25 +135,25 @@ public class AuthController {
         Object user = null;
         switch (req.userType.toUpperCase()) {
             case "CUSTOMER" -> {
-                var opt = customerRepo.findByUsernameOrEmailOrPhone(req.username);
+                var opt = customerRepo.findEnabled(req.username);
                 if (opt.isEmpty()) return ResponseEntity.status(401).body("Invalid credentials");
                 user = opt.get();
                 role = "CUSTOMER";
             }
             case "RIDER", "DELIVERYPARTNER" -> {
-                var opt = deliveryRepo.findByUsernameOrEmailOrPhone(req.username);
+                var opt = deliveryRepo.findEnabled(req.username);
                 if (opt.isEmpty()) return ResponseEntity.status(401).body("Invalid credentials");
                 user = opt.get();
                 role = "RIDER";
             }
             case "RESTAURANT" -> {
-                var opt = restaurantRepo.findByUsernameOrEmailOrPhone(req.username);
+                var opt = restaurantRepo.findEnabled(req.username);
                 if (opt.isEmpty()) return ResponseEntity.status(401).body("Invalid credentials");
                 user = opt.get();
                 role = "RESTAURANT";
             }
             case "ADMIN" -> {
-                var opt = adminRepo.findByUsernameOrEmailOrPhone(req.username);
+                var opt = adminRepo.findEnabled(req.username);
                 if (opt.isEmpty()) return ResponseEntity.status(401).body("Invalid credentials");
                 user = opt.get();
                 role = "ADMIN";
@@ -218,7 +218,7 @@ public class AuthController {
         switch (userType != null ? userType.toUpperCase() : "") {
             case "CUSTOMER" -> {
                 var opt = customerRepo.findEnabled(username);
-                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
+                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getEnabled())) {
                     user = opt.get();
                     role = "CUSTOMER";
                 } else {
@@ -231,7 +231,7 @@ public class AuthController {
                     c.setPhone(null); // Not provided by Google //null because if we give "" it is unquie and we get error
                     c.setProfilePic(picture);
                     c.setGoogleId(googleId);
-                    c.setIsEnabled(true);
+                    c.setEnabled(true);
                     customerRepo.save(c);
                     user = c;
                     role = "CUSTOMER";
@@ -239,7 +239,7 @@ public class AuthController {
             }
             case "RIDER", "DELIVERYPARTNER" -> {
                 var opt = deliveryRepo.findEnabled(username);
-                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
+                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getEnabled())) {
                     user = opt.get();
                     role = "RIDER";
                 } else {
@@ -250,7 +250,7 @@ public class AuthController {
                     d.setPhone("");
                     d.setProfilePic(picture);
                     d.setGoogleId(googleId);
-                    d.setIsEnabled(true);
+                    d.setEnabled(true);
                     deliveryRepo.save(d);
                     user = d;
                     role = "RIDER";
@@ -258,7 +258,7 @@ public class AuthController {
             }
             case "RESTAURANT" -> {
                 var opt = restaurantRepo.findEnabled(username);
-                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
+                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getEnabled())) {
                     user = opt.get();
                     role = "RESTAURANT";
                 } else {
@@ -269,7 +269,7 @@ public class AuthController {
                     r.setPhone("");
                     r.setProfilePic(picture);
                     r.setGoogleId(googleId);
-                    r.setIsEnabled(true);
+                    r.setEnabled(true);
                     restaurantRepo.save(r);
                     user = r;
                     role = "RESTAURANT";
@@ -277,7 +277,7 @@ public class AuthController {
             }
             case "ADMIN" -> {
                 var opt = adminRepo.findEnabled(username);
-                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getIsEnabled())) {
+                if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getEnabled())) {
                     user = opt.get();
                     role = "ADMIN";
                 } else {
@@ -288,7 +288,7 @@ public class AuthController {
                     a.setPhone("");
                     a.setProfilePic(picture);
                     a.setGoogleId(googleId);
-                    a.setIsEnabled(true);
+                    a.setEnabled(true);
                     adminRepo.save(a);
                     user = a;
                     role = "ADMIN";
@@ -312,6 +312,10 @@ public class AuthController {
 			}
         	return null;
     }
+    
+    
+    // getting restaurent details available --------------------
+    // getting dishes provide by restaurent at that time by restaurent------------------
 }
 
 class RegistrationRequest { public String username, email, password, phone; }

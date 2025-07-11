@@ -2,6 +2,7 @@ package com.excelr.FoodDelivery.Models;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +26,7 @@ public class Admin {
     private String profilePic;
      private String profilePicPublicId;
     private String googleId;
-    private Boolean isEnabled = true;
+   
+    private Boolean enabled = true;
     private LocalDateTime createdAt = LocalDateTime.now();
 }

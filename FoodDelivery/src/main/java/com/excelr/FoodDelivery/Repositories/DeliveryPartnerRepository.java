@@ -13,6 +13,6 @@ public interface DeliveryPartnerRepository extends JpaRepository<DeliveryPartner
     @Query("SELECT d FROM DeliveryPartner d WHERE d.username = :input OR d.email = :input OR d.phone = :input")
     Optional<DeliveryPartner> findByUsernameOrEmailOrPhone(@Param("input") String input);
 
-    @Query("SELECT d FROM DeliveryPartner d WHERE (d.username = :input OR d.email = :input OR d.phone = :input) AND d.isEnabled = true")
+    @Query("SELECT d FROM DeliveryPartner d WHERE (d.username = :input OR d.email = :input OR d.phone = :input) AND d.enabled = true")
     Optional<DeliveryPartner> findEnabled(@Param("input") String input);
 }
