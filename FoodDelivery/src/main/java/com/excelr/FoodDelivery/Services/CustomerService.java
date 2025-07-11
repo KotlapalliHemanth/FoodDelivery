@@ -32,7 +32,7 @@ public class CustomerService {
 	@Autowired
 	private CloudinaryUtil cloudinaryUtil;
 
-	public CustomerDetailsDTO updateCustomerDetails(Customer customer, Customer update, MultipartFile newProfilePic) throws Exception {
+	public CustomerDetailsDTO updateCustomerDetails(Customer customer, CustomerDetailsDTO update, MultipartFile newProfilePic) throws Exception {
         // Only update fields if provided (not null), except addresses and password
 
         // Handle profile pic replacement
@@ -49,11 +49,12 @@ public class CustomerService {
 
 
         if (update.getUsername() != null) customer.setUsername(update.getUsername());
-        if (update.getEmail() != null) customer.setEmail(update.getEmail());
-        if (update.getPhone() != null) customer.setPhone(update.getPhone());
-        if (update.getEnabled() != null) customer.setEnabled(update.getEnabled());
         if (update.getFirstName() != null) customer.setFirstName(update.getFirstName());
         if (update.getLastName() != null) customer.setLastName(update.getLastName());
+        if (update.getEmail() != null) customer.setEmail(update.getEmail());
+        if (update.getPhone() != null) customer.setPhone(update.getPhone());
+        customer.setEnabled(update.isEnabled());
+       
         // Do NOT update addresses or password here
 
         Customer c= customerRepo.save(customer);

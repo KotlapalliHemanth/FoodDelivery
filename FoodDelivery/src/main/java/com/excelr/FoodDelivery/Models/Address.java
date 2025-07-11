@@ -1,6 +1,7 @@
 package com.excelr.FoodDelivery.Models;
 
 import com.excelr.FoodDelivery.Models.Enum.AddressOwnerType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -26,7 +28,7 @@ public class Address {
     private String state;
     private String pincode;
     private String country;
-
+    private String AddressName;
     private Double latitude;
     private Double longitude;
 
@@ -35,10 +37,12 @@ public class Address {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @JsonIgnore
     private Customer customer;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "restaurant_id")
+    @JsonIgnore
     private Restaurant restaurant;
 
     private Boolean isPrimary = false;
