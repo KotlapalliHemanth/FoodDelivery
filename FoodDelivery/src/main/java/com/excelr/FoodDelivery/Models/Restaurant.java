@@ -40,5 +40,5 @@ public class Restaurant {
     private List<Dish> dishes;
 
     @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    private List<Address> addresses;
+    private Address addresses;
 }
