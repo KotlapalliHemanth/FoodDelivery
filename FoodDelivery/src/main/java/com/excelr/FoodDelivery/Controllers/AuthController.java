@@ -225,7 +225,7 @@ public class AuthController {
                     c.setFirstName(firstName);
                     c.setLastName(lastName);
                     c.setEmail(email);
-                    c.setPassword(""); // No password for OAuth
+                    c.setPassword(passwordEncoder.encode(googleId)); // No password for OAuth
                     c.setPhone(""); // Not provided by Google
                     c.setProfilePic(picture);
                     c.setGoogleId(googleId);
@@ -244,7 +244,7 @@ public class AuthController {
                     DeliveryPartner d = new DeliveryPartner();
                     d.setUsername(name != null ? name : username);
                     d.setEmail(email);
-                    d.setPassword("");
+                    d.setPassword(passwordEncoder.encode(googleId));
                     d.setPhone("");
                     d.setProfilePic(picture);
                     d.setGoogleId(googleId);
@@ -263,7 +263,7 @@ public class AuthController {
                     Restaurant r = new Restaurant();
                     r.setUsername(name != null ? name : username);
                     r.setEmail(email);
-                    r.setPassword("");
+                    r.setPassword(passwordEncoder.encode(googleId));
                     r.setPhone("");
                     r.setProfilePic(picture);
                     r.setGoogleId(googleId);
@@ -282,7 +282,7 @@ public class AuthController {
                     Admin a = new Admin();
                     a.setUsername(name != null ? name : username);
                     a.setEmail(email);
-                    a.setPassword("");
+                    a.setPassword(passwordEncoder.encode(googleId));
                     a.setPhone("");
                     a.setProfilePic(picture);
                     a.setGoogleId(googleId);

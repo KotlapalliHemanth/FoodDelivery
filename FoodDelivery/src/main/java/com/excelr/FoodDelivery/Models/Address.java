@@ -22,13 +22,14 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String fulladdress;
     private String street;
     private String city;
     private String state;
     private String pincode;
     private String country;
     private String AddressName;
+    private String landmark;
     private Double latitude;
     private Double longitude;
 
@@ -45,7 +46,7 @@ public class Address {
     @JsonIgnore
     private Restaurant restaurant;
 
-    private Boolean isPrimary = false;
+    private Boolean isActive = false;
 }
 
 

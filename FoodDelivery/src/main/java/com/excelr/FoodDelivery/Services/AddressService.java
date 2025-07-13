@@ -33,7 +33,7 @@ public class AddressService {
 		address.setLongitude(a.getLongitude());
 		address.setOwnerType(AddressOwnerType.CUSTOMER);
 		address.setCustomer(c);
-		
+		address.setIsActive(true);
 		return addressRepo.save(address);
 	}
 	
@@ -49,7 +49,7 @@ public class AddressService {
 		address.setLongitude(a.getLongitude());
 		address.setOwnerType(AddressOwnerType.RESTAURANT);
 		address.setRestaurant(c);
-
+		address.setIsActive(true);
 		return addressRepo.save(address);
 	}
 	
@@ -65,7 +65,7 @@ public class AddressService {
 		address.setLatitude(a.getLatitude());
 		address.setLongitude(a.getLongitude());
 		address.setAddressName(a.getAddressName());
-		
+				
 		return addressRepo.save(address);
 	
 	}
