@@ -135,11 +135,11 @@ public class CustomerController {
         return ResponseEntity.ok(addressService.createCustomerAddress(customer, a));
     }
     
-    @PutMapping("/address")
-    public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
-    	
-    	return ResponseEntity.ok(addressService.modifyAddress( a));
-    }
+//    @PutMapping("/address")
+//    public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
+//    	
+//    	return ResponseEntity.ok(addressService.modifyAddress( a));
+//    }
     
     @DeleteMapping("/address")
     public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a){
