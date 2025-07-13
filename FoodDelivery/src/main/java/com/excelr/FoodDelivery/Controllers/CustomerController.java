@@ -25,7 +25,6 @@ import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
-import com.excelr.FoodDelivery.Repositories.AddressRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
 import com.excelr.FoodDelivery.Services.AddressService;
@@ -130,29 +129,38 @@ public class CustomerController {
     
     @PostMapping("/address")
     public ResponseEntity<?> addAddress(Authentication authentication, @RequestBody AddressDTO a){
-    	String email = authentication.getName();
+        String email = authentication.getName();
         Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
-        
-        return ResponseEntity.ok(addressService.createCustomerAddress(customer, a));
+        addressService.createCustomerAddress(customer, a);
+        // Always return the updated list of addresses
+        return ResponseEntity.ok(customer.getAddresses() != null ? customer.getAddresses() : List.of());
     }
-    
+
     @PutMapping("/address")
     public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
-    	
-    	return ResponseEntity.ok(addressService.modifyAddress( a));
+        addressService.modifyAddress(a);
+        String email = authentication.getName();
+        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return ResponseEntity.ok(customer.getAddresses() != null ? customer.getAddresses() : List.of());
     }
-    
+
     @DeleteMapping("/address")
     public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a){
-    	addressService.deleteAddress(a);
-    	return ResponseEntity.ok("deleted");
+        addressService.deleteAddress(a);
+        String email = authentication.getName();
+        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return ResponseEntity.ok(customer.getAddresses() != null ? customer.getAddresses() : List.of());
     }
-    
+
     @GetMapping("/address")
-    public ResponseEntity<?> getAddress(Authentication authentication, @RequestBody AddressDTO a){
-    	
-    	return ResponseEntity.ok(addressService.getAddresses(a.getId()));
+    public ResponseEntity<?> getAddresses(Authentication authentication){
+        String email = authentication.getName();
+        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return ResponseEntity.ok(customer.getAddresses() != null ? customer.getAddresses() : List.of());
     }
     
     
