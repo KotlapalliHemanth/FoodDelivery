@@ -29,4 +29,7 @@ public class Dish {
     private String imagePublicId;
     private Double price;
     private String description;
+    private String category;
+    private String cusine;
+    private Boolean available;
 }

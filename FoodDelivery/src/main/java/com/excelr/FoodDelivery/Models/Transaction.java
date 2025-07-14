@@ -36,5 +36,5 @@ public class Transaction {
     @JsonIgnore
     private Order order;
 
-    private LocalDateTime paidAt = LocalDateTime.now();
+    private LocalDateTime paidAt;
 }

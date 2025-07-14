@@ -30,7 +30,7 @@ public class Restaurant {
     private String phone;
     private String password;
     private String profilePic;
-     private String profilePicPublicId;
+    private String profilePicPublicId;
     private String googleId;
     
     private Boolean enabled = true;

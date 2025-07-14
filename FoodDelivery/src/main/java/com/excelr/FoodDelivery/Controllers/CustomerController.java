@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,7 @@ import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
+import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Repositories.AddressRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
@@ -58,16 +60,17 @@ public class CustomerController {
     
 //  api for  details
     @PostMapping(value = "/details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CustomerDetailsDTO> getAndUpdateUserProfile(
+    public ResponseEntity<CustomerResponse> getAndUpdateUserProfile(
             Authentication authentication,
             @RequestPart(required = false) CustomerDetailsDTO update,
             @RequestPart(required = false) MultipartFile profilePic) throws Exception {
 
     	String email = authentication.getName();
-        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+        Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        CustomerDetailsDTO d = null;
+        
+		CustomerDetailsDTO d = null;
         if(update==null && profilePic==null) { //details not provided(used got getting details)
         	 d = new CustomerDetailsDTO(customer);
         	System.out.println(d);
@@ -77,7 +80,12 @@ public class CustomerController {
             System.out.println(customer);
             
         }
-        return ResponseEntity.ok(d);
+        
+        Object user = customerRepo.findEnabled(d.getEmail())
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        
+		String jwt = jwtUtil.generateAccessTokken(user, "CUSTOMER");
+        return ResponseEntity.ok(new CustomerResponse(jwt, d));
     }
 
     
@@ -87,7 +95,7 @@ public class CustomerController {
     @GetMapping("/orders")
     public ResponseEntity<List<Order>> getUserOrders(Authentication authentication) {
         String email = authentication.getName();
-        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+        Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         List<Order> orders = customer.getOrders();
@@ -99,7 +107,7 @@ public class CustomerController {
     @PostMapping("/orders")
     public ResponseEntity<Order> createOrder(Authentication authentication, @RequestBody CreateOrderDTO req) {
         String email = authentication.getName();
-        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+        Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         // Assuming you have a method to create an order
@@ -114,7 +122,7 @@ public class CustomerController {
     @PutMapping("/orders")
     public ResponseEntity<Order> modifyOrder(Authentication authentication, @RequestBody ModifyOrderDTO req){
     	 String email = authentication.getName();
-         Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+         Customer customer = customerRepo.findEnabled(email)
                  .orElseThrow(() -> new RuntimeException("Customer not found"));
          
          Order newOrder = orderService.modifyOrder(customer, req);
@@ -129,7 +137,7 @@ public class CustomerController {
     @PostMapping("/address")
     public ResponseEntity<?> addAddress(Authentication authentication, @RequestBody AddressDTO a){
     	String email = authentication.getName();
-        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+        Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         
         return ResponseEntity.ok(addressService.createCustomerAddress(customer, a));
@@ -182,4 +190,13 @@ public class CustomerController {
     
     //request bodies 
     class PasswordReqBody { public String oldPassword, newPassword; }
+    
+    class CustomerResponse { 
+		public String token;
+		public CustomerDetailsDTO r;
+	public CustomerResponse(String t, CustomerDetailsDTO res) { 
+		token = t; 
+		r=res;
+		} 
+	}
 }

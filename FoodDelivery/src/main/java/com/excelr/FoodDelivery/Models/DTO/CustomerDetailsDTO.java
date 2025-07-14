@@ -15,7 +15,7 @@ public class CustomerDetailsDTO {
 	private String email;
 	private String phone;
 	private String profilePic;
-	private boolean isEnabled;
+	private Boolean isEnabled;
 	
 	public CustomerDetailsDTO(Customer customer) {
 		this.id = customer.getId();
