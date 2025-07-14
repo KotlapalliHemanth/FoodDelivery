@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.excelr.FoodDelivery.Models.Address;
 import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Order;
 import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
@@ -134,7 +135,11 @@ public class CustomerController {
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         addressService.createCustomerAddress(customer, a);
         // Always return the updated list of addresses
-        return ResponseEntity.ok(customer.getAddresses() != null ? customer.getAddresses() : List.of());
+        return ResponseEntity.ok(
+        	    customer.getAddresses() != null
+        	        ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
+        	        : List.of()
+        	);
     }
 
     @PutMapping("/address")
@@ -143,7 +148,11 @@ public class CustomerController {
         String email = authentication.getName();
         Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
-        return ResponseEntity.ok(customer.getAddresses() != null ? customer.getAddresses() : List.of());
+        return ResponseEntity.ok(
+        	    customer.getAddresses() != null
+        	        ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
+        	        : List.of()
+        	);
     }
 
     @DeleteMapping("/address")
@@ -152,7 +161,11 @@ public class CustomerController {
         String email = authentication.getName();
         Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
-        return ResponseEntity.ok(customer.getAddresses() != null ? customer.getAddresses() : List.of());
+        return ResponseEntity.ok(
+        	    customer.getAddresses() != null
+        	        ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
+        	        : List.of()
+        	);
     }
 
     @GetMapping("/address")
@@ -160,7 +173,11 @@ public class CustomerController {
         String email = authentication.getName();
         Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
-        return ResponseEntity.ok(customer.getAddresses() != null ? customer.getAddresses() : List.of());
+        return ResponseEntity.ok(
+            customer.getAddresses() != null
+                ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
+                : List.of()
+        );
     }
     
     
