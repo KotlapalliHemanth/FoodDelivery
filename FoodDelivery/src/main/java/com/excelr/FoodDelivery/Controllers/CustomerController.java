@@ -75,8 +75,7 @@ public class CustomerController {
         if(update==null && profilePic==null) { //details not provided(used got getting details)
         	 d = new CustomerDetailsDTO(customer);
         	System.out.println(d);
-        }
-        if(update!=null || profilePic!=null) {
+        }else {
         	 d = customerService.updateCustomerDetails(customer, update, profilePic);
             
            
