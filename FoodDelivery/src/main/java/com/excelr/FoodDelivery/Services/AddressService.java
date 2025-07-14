@@ -53,29 +53,32 @@ public class AddressService {
 		return addressRepo.save(address);
 	}
 	
-	public Address modifyAddress(AddressDTO a) {
-		Address address= addressRepo.findById(a.getId())
-					.orElseThrow(() -> new RuntimeException("Address not found"));
-		
-		address.setStreet(a.getStreet());
-		address.setState(a.getState());
-		address.setCity(a.getCity());
-		address.setPincode(a.getPincode());
-		address.setCountry(a.getCountry());
-		address.setLatitude(a.getLatitude());
-		address.setLongitude(a.getLongitude());
-		address.setAddressName(a.getAddressName());
-				
-		return addressRepo.save(address);
-	
-	}
+//	public Address modifyAddress(AddressDTO a) {
+//		Address address= addressRepo.findById(a.getId())
+//					.orElseThrow(() -> new RuntimeException("Address not found"));
+//		
+//		address.setStreet(a.getStreet());
+//		address.setState(a.getState());
+//		address.setCity(a.getCity());
+//		address.setPincode(a.getPincode());
+//		address.setCountry(a.getCountry());
+//		address.setLatitude(a.getLatitude());
+//		address.setLongitude(a.getLongitude());
+//		address.setAddressName(a.getAddressName());
+//				
+//		return addressRepo.save(address);
+//	
+//	}
 	
 	public List<Address> getAddresses ( Long id) {
 		return  addressRepo.findByOwnerId(id);
 	}
 	
 	public void deleteAddress(AddressDTO a) {
-		addressRepo.deleteById(a.getId());
+		Address address= addressRepo.findById(a.getId())
+				.orElseThrow(() -> new RuntimeException("Address not found"));
+		
+		address.setIsActive(false);
 	
 	}
 	

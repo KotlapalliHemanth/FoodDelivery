@@ -24,15 +24,23 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+   
     private String firstName;   // Add this
+ 
     private String lastName;    // Add this
+  
     private String username;
+   
     private String email;
+  
     private String phone;
+    
     private String password;
+    
     private String profilePic; // image URL (Cloudinary or Google)
+    
     private String profilePicPublicId; // Cloudinary public_id, null if Google
+    
     private String googleId;
     
    
@@ -40,9 +48,10 @@ public class Customer {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    
     private List<Order> orders;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    
     private List<Address> addresses;
 }

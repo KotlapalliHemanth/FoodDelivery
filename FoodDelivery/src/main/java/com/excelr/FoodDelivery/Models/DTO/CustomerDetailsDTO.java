@@ -23,7 +23,11 @@ public class CustomerDetailsDTO {
 		this.lastName = customer.getLastName();
 		this.username = customer.getUsername();
 		this.email = customer.getEmail();
-		this.phone = customer.getPhone();
+		if(customer.getPhone()==customer.getGoogleId()) {
+			this.phone = "";
+		}else {
+			this.phone = customer.getPhone();
+		}
 		this.profilePic = customer.getProfilePic();
 		this.isEnabled= customer.getEnabled();
 	}

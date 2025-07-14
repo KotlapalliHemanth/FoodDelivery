@@ -194,6 +194,7 @@ public class AuthController {
             googleId = oidcUser.getAttribute("sub");
             firstName = oidcUser.getAttribute("given_name");
             lastName = oidcUser.getAttribute("family_name");
+//            System.out.println(oidcUser);
         } else if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User oauth2User) {
             email = oauth2User.getAttribute("email");
             name = oauth2User.getAttribute("name");
@@ -201,6 +202,7 @@ public class AuthController {
             googleId = oauth2User.getAttribute("sub");
             firstName = oauth2User.getAttribute("given_name");
             lastName = oauth2User.getAttribute("family_name");
+//            System.out.println(oauth2User);
         }
 
         // Fallback: If firstName or lastName is null, try to split the name
@@ -210,14 +212,16 @@ public class AuthController {
             lastName = (lastName == null && parts.length > 1) ? parts[1] : lastName;
         }
 
+        
         String username = email != null ? email : (name != null ? name : googleId);
-
+//        System.out.println(email+ " ---- "+ name+ " ---- "+ picture+ " ---- "+googleId+ " ---- "+firstName+ " ---- "+lastName);        
         Object user = null;
         String role = null;
 
         switch (userType != null ? userType.toUpperCase() : "") {
             case "CUSTOMER" -> {
                 var opt = customerRepo.findEnabled(username);
+                System.out.println(opt);
                 if (opt.isPresent() && Boolean.TRUE.equals(opt.get().getEnabled())) {
                     user = opt.get();
                     role = "CUSTOMER";
@@ -228,7 +232,7 @@ public class AuthController {
                     c.setLastName(lastName);
                     c.setEmail(email);
                     c.setPassword(passwordEncoder.encode(googleId)); // No password for OAuth
-                    c.setPhone(""); // Not provided by Google
+                    c.setPhone(googleId); // Not provided by Google
                     c.setProfilePic(picture);
                     c.setGoogleId(googleId);
                     c.setEnabled(true);
@@ -247,7 +251,7 @@ public class AuthController {
                     d.setUsername(name != null ? name : username);
                     d.setEmail(email);
                     d.setPassword(passwordEncoder.encode(googleId));
-                    d.setPhone("");
+                    d.setPhone(googleId);
                     d.setProfilePic(picture);
                     d.setGoogleId(googleId);
                     d.setEnabled(true);
@@ -266,7 +270,7 @@ public class AuthController {
                     r.setUsername(name != null ? name : username);
                     r.setEmail(email);
                     r.setPassword(passwordEncoder.encode(googleId));
-                    r.setPhone("");
+                    r.setPhone(googleId);
                     r.setProfilePic(picture);
                     r.setGoogleId(googleId);
                     r.setEnabled(true);
@@ -285,7 +289,7 @@ public class AuthController {
                     a.setUsername(name != null ? name : username);
                     a.setEmail(email);
                     a.setPassword(passwordEncoder.encode(googleId));
-                    a.setPhone("");
+                    a.setPhone(googleId);
                     a.setProfilePic(picture);
                     a.setGoogleId(googleId);
                     a.setEnabled(true);
