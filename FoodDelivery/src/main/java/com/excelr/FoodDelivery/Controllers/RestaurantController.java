@@ -5,7 +5,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,8 +57,7 @@ public class RestaurantController {
         if(update==null && profilePic==null) { //details not provided(used got getting details)
         	 d = new RestaurantDetailsDTO(restaurant);
         	System.out.println(d);
-        }
-        if(update!=null || profilePic!=null) { //details provided for updating details
+        }else{ //details provided for updating details
         	 d = restaurantService.updateRestaurantDetails(restaurant, update, profilePic);
             System.out.println(restaurant);
             
@@ -86,8 +87,28 @@ public class RestaurantController {
         return ResponseEntity.ok(d);
 	}
 	
+	// update dish
+	
+	@PutMapping(value="/dishmodify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<DishDTO> modifyDish(Authentication authentication,
+            @RequestPart(required = false) DishDTO update,
+            @RequestPart(required = false) MultipartFile profilePic) throws Exception{
+		String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        
+		DishDTO d= dishService.modifyDish(restaurant,update, profilePic);
+		return ResponseEntity.ok(d);
+	}
+	
 	
 	// delete items -------------------------
+	
+//	@DeleteMapping("/deletedish")
+//	public ResponseEntity<String> deleteDish(Authentication authentication,
+//            @RequestPart DishDTO update){
+//		
+//	}
 	
 	// availability of items------------------
 	

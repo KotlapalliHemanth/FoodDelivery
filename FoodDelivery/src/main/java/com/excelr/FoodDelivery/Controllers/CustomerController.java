@@ -74,15 +74,14 @@ public class CustomerController {
         if(update==null && profilePic==null) { //details not provided(used got getting details)
         	 d = new CustomerDetailsDTO(customer);
         	System.out.println(d);
-        }
-        if(update!=null || profilePic!=null) { //details provided for updating details
+        }else { //details provided for updating details
         	 d = customerService.updateCustomerDetails(customer, update, profilePic);
             System.out.println(customer);
             
         }
         
         Object user = customerRepo.findEnabled(d.getEmail())
-                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+                .orElseThrow(() -> new RuntimeException("customer not found"));
         
 		String jwt = jwtUtil.generateAccessTokken(user, "CUSTOMER");
         return ResponseEntity.ok(new CustomerResponse(jwt, d));

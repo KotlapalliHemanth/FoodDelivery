@@ -22,6 +22,7 @@ public class DishDTO {
     private String category;
     private String cusine;
     private Boolean available;
+    private Boolean deleted;
     
     public DishDTO(Dish dish) {
     	this.id= dish.getId();
@@ -32,6 +33,7 @@ public class DishDTO {
     	this.category= dish.getCategory();
     	this.cusine= dish.getCusine();
     	this.available= dish.getAvailable();
+    	this.deleted= dish.getDeleted();
     	
     }
 }

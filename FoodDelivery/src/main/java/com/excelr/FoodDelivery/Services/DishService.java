@@ -21,7 +21,7 @@ public class DishService {
 	
 	public DishDTO createDish (Restaurant r, DishDTO d, MultipartFile newProfilePic ) throws Exception {
 		Dish dish= new Dish();
-		dish.setId(d.getId());
+	
 		dish.setName(d.getName());
 		dish.setPrice(d.getPrice());
 		dish.setCategory(d.getCategory());
@@ -37,9 +37,38 @@ public class DishService {
             CloudinaryUtil.UploadResult result = cloudinaryUtil.uploadImage(newProfilePic);
             dish.setImage(result.imageUrl);
             dish.setImagePublicId(result.publicId);
-            dish.setRestaurant(r);
+            
         } 
+		dish.setDeleted(false);
+		dish.setRestaurant(r);
+		return new DishDTO(dishRepo.save(dish));
 		
+	}
+	
+	public DishDTO modifyDish (Restaurant r,DishDTO d, MultipartFile newProfilePic)throws Exception {
+		Dish dA = dishRepo.findById(d.getId())
+				.orElseThrow(() -> new RuntimeException("restaurant not found"));
+		dA.setDeleted(true);
+		Dish dish= new Dish();
+		
+		dish.setName(d.getName());
+		dish.setPrice(d.getPrice());
+		dish.setCategory(d.getCategory());
+		dish.setCusine(d.getCusine());
+		dish.setDescription(d.getDescription());
+		dish.setAvailable(d.getAvailable());
+		if (newProfilePic != null && !newProfilePic.isEmpty()) {
+            // Delete old image from Cloudinary if it exists
+            if (dish.getImagePublicId() != null) {
+                cloudinaryUtil.deleteImage(dish.getImagePublicId());
+            }
+            // Upload new image
+            CloudinaryUtil.UploadResult result = cloudinaryUtil.uploadImage(newProfilePic);
+            dish.setImage(result.imageUrl);
+            dish.setImagePublicId(result.publicId);  
+        } 
+		dish.setDeleted(false);
+		dish.setRestaurant(r);
 		return new DishDTO(dishRepo.save(dish));
 		
 	}
