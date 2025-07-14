@@ -69,10 +69,10 @@ public class JwtUtill {
 
         boolean userExists = false;
         switch (role) {
-            case "CUSTOMER" -> userExists = customerRepo.findByUsernameOrEmailOrPhone(subject).isPresent();
-            case "ADMIN" -> userExists = adminRepo.findByUsernameOrEmailOrPhone(subject).isPresent();
-            case "RESTAURANT" -> userExists = restaurantRepo.findByUsernameOrEmailOrPhone(subject).isPresent();
-            case "RIDER", "DELIVERYPARTNER" -> userExists = deliveryPartnerRepo.findByUsernameOrEmailOrPhone(subject).isPresent();
+            case "CUSTOMER" -> userExists = customerRepo.findEnabled(subject).isPresent();
+            case "ADMIN" -> userExists = adminRepo.findEnabled(subject).isPresent();
+            case "RESTAURANT" -> userExists = restaurantRepo.findEnabled(subject).isPresent();
+            case "RIDER", "DELIVERYPARTNER" -> userExists = deliveryPartnerRepo.findEnabled(subject).isPresent();
         }
 
         if (claim.getExpiration().before(new Date())) {

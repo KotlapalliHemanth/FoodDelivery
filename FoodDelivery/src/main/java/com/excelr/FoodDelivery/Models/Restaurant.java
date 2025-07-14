@@ -32,6 +32,7 @@ public class Restaurant {
     private String profilePic;
     private String profilePicPublicId;
     private String googleId;
+    private Boolean open;
     
     private Boolean enabled = true;
     private LocalDateTime createdAt = LocalDateTime.now();
