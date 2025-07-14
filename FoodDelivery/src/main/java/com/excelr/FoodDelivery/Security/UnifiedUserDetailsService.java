@@ -17,10 +17,10 @@ public class UnifiedUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
         Optional<? extends UserDetails> user =
-            customerRepo.findByUsernameOrEmailOrPhone(input).map(c -> buildUserDetails(c, "CUSTOMER"))
-            .or(() -> deliveryRepo.findByUsernameOrEmailOrPhone(input).map(d -> buildUserDetails(d, "RIDER")))
-            .or(() -> restaurantRepo.findByUsernameOrEmailOrPhone(input).map(r -> buildUserDetails(r, "RESTAURANT")))
-            .or(() -> adminRepo.findByUsernameOrEmailOrPhone(input).map(a -> buildUserDetails(a, "ADMIN")));
+            customerRepo.findEnabled(input).map(c -> buildUserDetails(c, "CUSTOMER"))
+            .or(() -> deliveryRepo.findEnabled(input).map(d -> buildUserDetails(d, "RIDER")))
+            .or(() -> restaurantRepo.findEnabled(input).map(r -> buildUserDetails(r, "RESTAURANT")))
+            .or(() -> adminRepo.findEnabled(input).map(a -> buildUserDetails(a, "ADMIN")));
 
         return user.orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

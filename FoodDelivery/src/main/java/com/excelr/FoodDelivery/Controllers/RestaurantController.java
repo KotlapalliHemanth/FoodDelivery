@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.excelr.FoodDelivery.Models.Customer;
+import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
+import com.excelr.FoodDelivery.Models.DTO.DishDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
+import com.excelr.FoodDelivery.Services.DishService;
 import com.excelr.FoodDelivery.Services.RestaurantService;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
 
@@ -32,6 +35,9 @@ public class RestaurantController {
 	RestaurantService restaurantService;
 	
 	@Autowired JwtUtill jwtUtil;
+	
+	@Autowired
+	private DishService dishService;
 	
 	// restaurent details (curd operations)-------------------
 	
@@ -65,6 +71,21 @@ public class RestaurantController {
     }
 	
 	// add & edit items-----------------------
+	@PostMapping(value="/dishadd", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<DishDTO> addDish(Authentication authentication,
+            @RequestPart(required = false) DishDTO update,
+            @RequestPart(required = false) MultipartFile profilePic) throws Exception{
+		String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        DishDTO d= null;
+        if(update != null || profilePic!= null) {
+        	 d= dishService.createDish(restaurant, update, profilePic);
+        }
+        
+        return ResponseEntity.ok(d);
+	}
+	
 	
 	// delete items -------------------------
 	
@@ -72,7 +93,7 @@ public class RestaurantController {
 	
 	// menu list-----------------
 	
-	// current orders--------------------
+	// current orders-------------------
 	
 	// edit accepted orders(declineing with reason)---------------------
 	
