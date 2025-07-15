@@ -70,21 +70,23 @@ public class CustomerController {
         Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        
+        Object user = null;
 		CustomerDetailsDTO d = null;
         if(update==null && profilePic==null) { //details not provided(used got getting details)
         	 d = new CustomerDetailsDTO(customer);
-        	System.out.println(d);
+        	 user= customerRepo.findEnabled(d.getEmail())
+                     .orElseThrow(() -> new RuntimeException("customer not found"));
+        	
         }else { //details provided for updating details
         	 d = customerService.updateCustomerDetails(customer, update, profilePic);
-            
-           
-            System.out.println(customer);
-            
+        	 System.out.println(d.getEmail());
         }
+           user= customerRepo.findEnabled(d.getEmail())
+                   .orElseThrow(() -> new RuntimeException("customer not found"));
+            
+          
+        System.out.println(d);
         
-        Object user = customerRepo.findEnabled(d.getEmail())
-                .orElseThrow(() -> new RuntimeException("customer not found"));
         
 		String jwt = jwtUtil.generateAccessTokken(user, "CUSTOMER");
         return ResponseEntity.ok(new CustomerResponse(jwt, d));
@@ -154,7 +156,7 @@ public class CustomerController {
     public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
         addressService.modifyAddress(a);
         String email = authentication.getName();
-        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+        Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         return ResponseEntity.ok(
         	    customer.getAddresses() != null
@@ -167,7 +169,7 @@ public class CustomerController {
     public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a){
         addressService.deleteAddress(a);
         String email = authentication.getName();
-        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+        Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         return ResponseEntity.ok(
         	    customer.getAddresses() != null
@@ -179,7 +181,7 @@ public class CustomerController {
     @GetMapping("/address")
     public ResponseEntity<?> getAddresses(Authentication authentication){
         String email = authentication.getName();
-        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+        Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         return ResponseEntity.ok(
             customer.getAddresses() != null
