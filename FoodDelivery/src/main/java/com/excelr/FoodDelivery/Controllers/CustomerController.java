@@ -83,6 +83,7 @@ public class CustomerController {
         }
            user= customerRepo.findEnabled(d.getEmail())
                    .orElseThrow(() -> new RuntimeException("customer not found"));
+            System.out.println(d);
             
           
         System.out.println(d);

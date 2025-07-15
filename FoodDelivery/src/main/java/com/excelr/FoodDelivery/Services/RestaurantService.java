@@ -38,7 +38,7 @@ public class RestaurantService {
         
         if (update.getEmail() != null) restaurant.setEmail(update.getEmail());
         if (update.getPhone() != null) restaurant.setPhone(update.getPhone());
-        restaurant.setEnabled(update.getEnabled());
+        if (update.getEnabled() != null) restaurant.setEnabled(update.getEnabled());
         
         Restaurant r= restaurantRepo.save(restaurant);
         return new RestaurantDetailsDTO(r);
