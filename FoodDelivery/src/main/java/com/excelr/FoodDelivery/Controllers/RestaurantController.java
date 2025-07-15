@@ -123,7 +123,7 @@ public class RestaurantController {
 		
 	}
 	
-	// availability of items------------------
+	// menu list-----------------
 	@GetMapping("/getDishes")
 	public ResponseEntity<?> getDishes (Authentication authentication){
 		String email = authentication.getName();
@@ -134,7 +134,7 @@ public class RestaurantController {
         return ResponseEntity.ok(dishes);
 	}
 	
-	// menu list-----------------
+	
 	
 	// current orders-------------------
 	

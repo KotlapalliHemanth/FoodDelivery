@@ -49,7 +49,7 @@ public class CustomerService {
         if (update.getLastName() != null) customer.setLastName(update.getLastName());
         if (update.getEmail() != null) customer.setEmail(update.getEmail());
         if (update.getPhone() != null) customer.setPhone(update.getPhone());
-        customer.setEnabled(update.getIsEnabled());
+        if (update.getIsEnabled() != null)customer.setEnabled(update.getIsEnabled());
        
         // Do NOT update addresses or password here
 
