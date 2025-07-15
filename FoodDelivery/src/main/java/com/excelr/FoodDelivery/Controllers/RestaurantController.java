@@ -1,5 +1,9 @@
 package com.excelr.FoodDelivery.Controllers;
 
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -125,8 +129,9 @@ public class RestaurantController {
 		String email = authentication.getName();
         Restaurant restaurant = restaurantRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("restaurant not found"));
+       List<Dish> dishes= restaurant.getDishes().stream().filter(dish-> !dish.getDeleted()).collect(Collectors.toList());
         
-        return ResponseEntity.ok(restaurant.getDishes());
+        return ResponseEntity.ok(dishes);
 	}
 	
 	// menu list-----------------
