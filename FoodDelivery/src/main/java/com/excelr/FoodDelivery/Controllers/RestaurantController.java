@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,7 +92,7 @@ public class RestaurantController {
 	
 	@PutMapping(value="/dishmodify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<DishDTO> modifyDish(Authentication authentication,
-            @RequestPart(required = false) DishDTO update,
+            @RequestPart DishDTO update,
             @RequestPart(required = false) MultipartFile profilePic) throws Exception{
 		String email = authentication.getName();
         Restaurant restaurant = restaurantRepo.findEnabled(email)
@@ -104,13 +105,29 @@ public class RestaurantController {
 	
 	// delete items -------------------------
 	
-//	@DeleteMapping("/deletedish")
-//	public ResponseEntity<String> deleteDish(Authentication authentication,
-//            @RequestPart DishDTO update){
-//		
-//	}
+	@DeleteMapping("/deletedish")
+	public ResponseEntity<String> deleteDish(Authentication authentication,
+            @RequestPart DishDTO update) throws Exception{
+		String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+		dishService.deleteDish(restaurant, update);
+		
+		return ResponseEntity.ok("deleted sucessfully");
+		
+		
+		
+	}
 	
 	// availability of items------------------
+	@GetMapping("/getDishes")
+	public ResponseEntity<?> getDishes (Authentication authentication){
+		String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        
+        return ResponseEntity.ok(restaurant.getDishes());
+	}
 	
 	// menu list-----------------
 	

@@ -47,8 +47,9 @@ public class DishService {
 	
 	public DishDTO modifyDish (Restaurant r,DishDTO d, MultipartFile newProfilePic)throws Exception {
 		Dish dA = dishRepo.findById(d.getId())
-				.orElseThrow(() -> new RuntimeException("restaurant not found"));
+				.orElseThrow(() -> new RuntimeException("dish not found"));
 		dA.setDeleted(true);
+		dishRepo.save(dA);
 		Dish dish= new Dish();
 		
 		dish.setName(d.getName());
@@ -72,5 +73,14 @@ public class DishService {
 		return new DishDTO(dishRepo.save(dish));
 		
 	}
-
+	
+	public void deleteDish (Restaurant r,DishDTO d)throws Exception{
+		Dish dA = dishRepo.findById(d.getId())
+				.orElseThrow(() -> new RuntimeException("dish already not found"));
+		dA.setDeleted(true);
+		dishRepo.save(dA);
+		
+	}
+	
+	
 }

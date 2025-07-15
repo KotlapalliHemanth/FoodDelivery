@@ -76,7 +76,7 @@ public class CustomerController {
         	System.out.println(d);
         }else { //details provided for updating details
         	 d = customerService.updateCustomerDetails(customer, update, profilePic);
-            System.out.println(customer);
+            System.out.println(d);
             
         }
         
@@ -168,7 +168,7 @@ public class CustomerController {
     @PutMapping("/password")
     public ResponseEntity<?> changePassword(Authentication authentication, @RequestBody PasswordReqBody passwordReqBody){
     	String email = authentication.getName();
-        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+        Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         
         if(passwordEncoder.matches(passwordReqBody.oldPassword, customer.getPassword())) {
