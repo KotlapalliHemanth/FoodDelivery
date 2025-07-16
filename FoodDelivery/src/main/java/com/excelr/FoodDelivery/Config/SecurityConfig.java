@@ -100,7 +100,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:3000","http://localhost:5173" , "http://localhost:5174") // or your actual frontend domain
+                    .allowedOrigins("http://localhost:3000","http://localhost:5173" , "http://localhost:5174" ,"https://p-34-food-del-customer-module.onrender.com") // or your actual frontend domain
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true);
