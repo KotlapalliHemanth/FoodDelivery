@@ -56,7 +56,7 @@ public class SecurityConfig {
                     "/swagger-resources/**",
                     "/webjars/**"
                 ).permitAll()
-                .requestMatchers("/auth/**", "/register/**", "/login/**", "/oauth2/**").permitAll()
+                .requestMatchers("/auth/**", "/register/**", "/login/**", "/oauth2/**", "/customer/restaurantDetails", "/customer/restaurantAtLocation").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/restaurant/**").hasRole("RESTAURANT")
                 .requestMatchers("/customer/**").hasRole("CUSTOMER")

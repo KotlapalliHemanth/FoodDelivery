@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Order;
+import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
@@ -29,10 +30,12 @@ import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Repositories.AddressRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
+import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
 import com.excelr.FoodDelivery.Services.AddressService;
 import com.excelr.FoodDelivery.Services.CustomerService;
 import com.excelr.FoodDelivery.Services.OrderService;
+import com.excelr.FoodDelivery.Services.RestaurantService;
 
 @RestController
 @RequestMapping("/customer")
@@ -41,6 +44,12 @@ public class CustomerController {
 
     @Autowired
     private CustomerRepository customerRepo;
+    
+    @Autowired
+    private RestaurantService restaurantService;
+    
+    @Autowired
+    private RestaurantRepository restaurantRepo;
     
     @Autowired
     private AddressService addressService;
@@ -184,6 +193,22 @@ public class CustomerController {
     }
     
     //others-----------------
+    
+    	//get restaurant details--------------------
+    @GetMapping("/restaurantAtLocation")
+    public ResponseEntity<?> getRestaurantDetailsByLocation(Double lat, Double lon, Double radius, String searchName){
+    	
+    	return ResponseEntity.ok(restaurantService.findAndFilterRestaurantsByLocation(lat, lon, radius, searchName));
+    }
+    
+    // get reataurant details----------------
+    @GetMapping("/restaurantDetails")
+    public ResponseEntity<Restaurant> getRestaurantDetails(Long rId){
+    		
+    	Restaurant r= restaurantRepo.findById(rId).orElseThrow(() -> new RuntimeException("Customer not found"));
+    	return ResponseEntity.ok(r);
+    	
+    }
     
     
     
