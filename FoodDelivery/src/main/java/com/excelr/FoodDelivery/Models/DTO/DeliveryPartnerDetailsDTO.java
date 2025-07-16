@@ -30,5 +30,7 @@ public class DeliveryPartnerDetailsDTO {
 		}
     	this.profilePic= rider.getProfilePic();
     	this.enabled= rider.getEnabled();
+    	this.googleId= rider.getGoogleId();
+    	
     }
 }

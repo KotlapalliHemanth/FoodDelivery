@@ -53,22 +53,30 @@ public class AddressService {
 		return addressRepo.save(address);
 	}
 	
-//	public Address modifyAddress(AddressDTO a) {
-//		Address address= addressRepo.findById(a.getId())
-//					.orElseThrow(() -> new RuntimeException("Address not found"));
-//		
-//		address.setStreet(a.getStreet());
-//		address.setState(a.getState());
-//		address.setCity(a.getCity());
-//		address.setPincode(a.getPincode());
-//		address.setCountry(a.getCountry());
-//		address.setLatitude(a.getLatitude());
-//		address.setLongitude(a.getLongitude());
-//		address.setAddressName(a.getAddressName());
-//				
-//		return addressRepo.save(address);
-//	
-//	}
+	public Address modifyAddress(AddressDTO a) {
+		Address address= addressRepo.findById(a.getId())
+					.orElseThrow(() -> new RuntimeException("Address not found"));
+		address.setIsActive(false);
+	 	Address newAddress= new Address();
+		newAddress.setStreet(a.getStreet());
+		newAddress.setState(a.getState());
+		newAddress.setCity(a.getCity());
+		newAddress.setPincode(a.getPincode());
+		newAddress.setCountry(a.getCountry());
+		newAddress.setLatitude(a.getLatitude());
+		newAddress.setLongitude(a.getLongitude());
+		newAddress.setAddressName(a.getAddressName());
+	    newAddress.setOwnerType(address.getOwnerType());
+	    if(address.getRestaurant() != null) {
+		newAddress.setRestaurant(address.getRestaurant());
+		}
+		if(address.getCustomer() != null) {
+		newAddress.setCustomer(address.getCustomer());
+		}
+		addressRepo.save(address);		
+		return addressRepo.save(newAddress);
+	
+		}
 	
 	public List<Address> getAddresses ( Long id) {
 		return  addressRepo.findByOwnerId(id);
@@ -79,6 +87,7 @@ public class AddressService {
 				.orElseThrow(() -> new RuntimeException("Address not found"));
 		
 		address.setIsActive(false);
+		addressRepo.save(address);
 	
 	}
 	

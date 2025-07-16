@@ -15,9 +15,10 @@ public class RestaurantDetailsDTO {
     private String restaurantName;
     private String email;
     private String phone;
-    private String profilePic;
+    private String restaurantPic;
     private Boolean enabled;
     private Boolean open;
+    private String googleId;
     
     public RestaurantDetailsDTO(Restaurant restaurant) {
     	this.id= restaurant.getId();
@@ -29,7 +30,8 @@ public class RestaurantDetailsDTO {
 		}else {
 			this.phone = restaurant.getPhone();
 		}
-    	this.profilePic= restaurant.getProfilePic();
+    	this.restaurantPic= restaurant.getProfilePic();
+    	this.googleId=restaurant.getGoogleId();
     	this.enabled= restaurant.getEnabled();
     	
     }

@@ -56,26 +56,14 @@ public class RestaurantService {
         return restaurants.stream()
             .filter(restaurant -> {
                 // Cuisine filter
-                if (searchName != null && !searchName.isEmpty()) {
-                    return restaurant.getDishes().stream()
+            	Boolean c =restaurant.getDishes().stream()
                         .anyMatch(dish -> dish.getCusine().equalsIgnoreCase(searchName));
-                }
-                return true; // No filter applied
-            })
-            .filter(restaurant -> {
-                // Dish name filter
-                if (searchName != null && !searchName.isEmpty()) {
-                    return restaurant.getDishes().stream()
+            	
+            	Boolean d= restaurant.getDishes().stream()
                         .anyMatch(dish -> dish.getName().equalsIgnoreCase(searchName));
-                }
-                return true; // No filter applied
-            })
-            .filter(restaurant -> {
-                // Restaurant name filter (substring, case-insensitive)
-                if (searchName != null && !searchName.isEmpty()) {
-                    return restaurant.getRestaurantName().toLowerCase().contains(searchName.toLowerCase());
-                }
-                return true; // No filter applied
+            	
+            	Boolean n= restaurant.getRestaurantName().toLowerCase().contains(searchName.toLowerCase());
+                  return c || d || n; // No filter applied
             })
             .map(RestaurantDetailsforCustomersDTO::new).collect(Collectors.toList());
 	}

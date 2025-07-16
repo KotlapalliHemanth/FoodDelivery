@@ -15,6 +15,7 @@ public class CustomerDetailsDTO {
 	private String email;
 	private String phone;
 	private String profilePic;
+	private String googleId;
 	private Boolean isEnabled;
 	
 	public CustomerDetailsDTO(Customer customer) {
@@ -29,6 +30,7 @@ public class CustomerDetailsDTO {
 			this.phone = customer.getPhone();
 		}
 		this.profilePic = customer.getProfilePic();
+		this.googleId= customer.getGoogleId();
 		this.isEnabled= customer.getEnabled();
 	}
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -151,12 +152,12 @@ public class RestaurantController {
 	
 	// edit accepted orders(declineing with reason)---------------------
 	@PutMapping("/acceptOrRejectOrder")
-	public ResponseEntity<?> acceptOrRejectOrder (Authentication authentication, Long oId, boolean accept){
+	public ResponseEntity<?> acceptOrRejectOrder (Authentication authentication,@RequestBody AcceptOrRejectOrder a){
 		String email = authentication.getName();
         Restaurant restaurant = restaurantRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("restaurant not found"));
         
-        return ResponseEntity.ok(orderService.acceptOrRejectOrder(restaurant.getId(), oId, accept));
+        return ResponseEntity.ok(orderService.acceptOrRejectOrder(restaurant.getId(), a.oId, a.accept));
 	}
 	
 	
@@ -174,6 +175,7 @@ public class RestaurantController {
 	
 	// todays order stats---------------------
 	
+	// address curd operations------------------
 	
 	
 	
@@ -185,5 +187,11 @@ public class RestaurantController {
 		token = t; 
 		r=res;
 		} 
+	}
+	
+	class AcceptOrRejectOrder {
+		public Long oId;
+		public Boolean accept;
+		
 	}
 }
