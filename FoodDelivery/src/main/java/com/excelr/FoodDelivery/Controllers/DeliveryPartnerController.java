@@ -57,7 +57,7 @@ public class DeliveryPartnerController {
         Object user = riderRepo.findEnabled(d.getEmail())
                 .orElseThrow(() -> new RuntimeException("restaurant not found"));
         
-		String jwt = jwtUtil.generateAccessTokken(user, "RESTAURANT");
+		String jwt = jwtUtil.generateAccessTokken(user, "RIDER");
 //        return ResponseEntity.ok(new JwtResponse(jwt));
         return ResponseEntity.ok(new RiderResponse(jwt, d));
     }

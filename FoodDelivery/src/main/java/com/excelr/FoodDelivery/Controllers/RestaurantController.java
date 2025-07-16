@@ -159,6 +159,17 @@ public class RestaurantController {
         return ResponseEntity.ok(orderService.acceptOrRejectOrder(restaurant.getId(), oId, accept));
 	}
 	
+	
+	// accepted orders list---------------------
+	@GetMapping("/acceptedOrders")
+	public ResponseEntity<?> acceptedOrders(Authentication authentication){
+		String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        return ResponseEntity.ok(orderService.acceptedOrdersByRestaurant(restaurant.getId()));
+	} 
+	
+	
 	// completed order list with filters---------------------
 	
 	// todays order stats---------------------

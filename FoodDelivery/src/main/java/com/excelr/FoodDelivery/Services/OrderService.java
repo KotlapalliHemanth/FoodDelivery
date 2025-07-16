@@ -62,7 +62,7 @@ public class OrderService {
 		return orderRepo.findCreatedOrdersByRestaurantId(restaurant.getId());
 	}
 	
-	
+	//accept or reject order by restaurant-----------------
 	public Order acceptOrRejectOrder(Long rId, Long oId, boolean accept) {
 		Order order = orderRepo.findById(oId)
 				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
@@ -83,5 +83,10 @@ public class OrderService {
 		// 3. Update Status and Save
 		order.setStatus(accept ? OrderStatus.PREPARING : OrderStatus.REJECTED);
 		return orderRepo.save(order);
+	}
+	
+	//accepted order by restaurant---------------
+	public List<Order> acceptedOrdersByRestaurant(Long rID){
+		return orderRepo.findAcceptedOrdersByRestaurantId(rID);
 	}
 }
