@@ -1,9 +1,11 @@
 package com.excelr.FoodDelivery.Config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -25,9 +27,6 @@ import com.excelr.FoodDelivery.Security.UnifiedUserDetailsService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class SecurityConfig {
@@ -61,7 +60,7 @@ public class SecurityConfig {
                     "/webjars/**"
                 ).permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/auth/**", "/register/**", "/login/**", "/oauth2/**").permitAll()
+                .requestMatchers("/auth/**", "/register/**", "/login/**", "/oauth2/**", "/customer/restaurantDetails", "/customer/restaurantAtLocation").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/restaurant/**").hasRole("RESTAURANT")
                 .requestMatchers("/customer/**").hasRole("CUSTOMER")

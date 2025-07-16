@@ -6,9 +6,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.excelr.FoodDelivery.Models.Enum.OrderStatus;
 import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Order;
+import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
 import com.excelr.FoodDelivery.Repositories.DishRepository;
@@ -52,5 +54,39 @@ public class OrderService {
 		}
 		return order;
 	}
+	
+	
+	
+	//get orders for the new restaurent.......................
+	public List<Order> getCurrentOrders(Restaurant restaurant){
+		return orderRepo.findCreatedOrdersByRestaurantId(restaurant.getId());
+	}
+	
+	//accept or reject order by restaurant-----------------
+	public Order acceptOrRejectOrder(Long rId, Long oId, boolean accept) {
+		Order order = orderRepo.findById(oId)
+				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
 
+		
+		boolean isAuthorized = order.getDishes().stream()
+			.anyMatch(dish -> dish.getRestaurant() != null && dish.getRestaurant().getId().equals(rId));
+
+		if (!isAuthorized) {
+			throw new SecurityException("Restaurant with ID " + rId + " is not authorized to modify order with ID " + oId);
+		}
+
+		
+		if (order.getStatus() != OrderStatus.CREATED) {
+			throw new IllegalStateException("Order cannot be modified. Current status is: " + order.getStatus());
+		}
+
+		// 3. Update Status and Save
+		order.setStatus(accept ? OrderStatus.PREPARING : OrderStatus.REJECTED);
+		return orderRepo.save(order);
+	}
+	
+	//accepted order by restaurant---------------
+	public List<Order> acceptedOrdersByRestaurant(Long rID){
+		return orderRepo.findAcceptedOrdersByRestaurantId(rID);
+	}
 }
