@@ -49,34 +49,35 @@ public class RestaurantService {
         return new RestaurantDetailsDTO(r);
 	}
 	
-	public List<RestaurantDetailsforCustomersDTO> findAndFilterRestaurantsByLocation(Double latitude, Double longitude, Double radius,String searchName){
-		List<Restaurant> restaurants = restaurantRepo.findRestaurantsWithinRadius(latitude, longitude, radius);
+	public List<RestaurantDetailsforCustomersDTO> findAndFilterRestaurantsByLocation(
+	        Double latitude, Double longitude, Double radius, String searchName) {
+	    List<Restaurant> restaurants = restaurantRepo.findRestaurantsWithinRadius(latitude, longitude, radius);
 
-        // Apply filters using Java Streams
-        return restaurants.stream()
-            .filter(restaurant -> {
-                // Cuisine filter
-                if (searchName != null && !searchName.isEmpty()) {
-                    return restaurant.getDishes().stream()
-                        .anyMatch(dish -> dish.getCusine().equalsIgnoreCase(searchName));
-                }
-                return true; // No filter applied
-            })
-            .filter(restaurant -> {
-                // Dish name filter
-                if (searchName != null && !searchName.isEmpty()) {
-                    return restaurant.getDishes().stream()
-                        .anyMatch(dish -> dish.getName().equalsIgnoreCase(searchName));
-                }
-                return true; // No filter applied
-            })
-            .filter(restaurant -> {
-                // Restaurant name filter (substring, case-insensitive)
-                if (searchName != null && !searchName.isEmpty()) {
-                    return restaurant.getRestaurantName().toLowerCase().contains(searchName.toLowerCase());
-                }
-                return true; // No filter applied
-            })
-            .map(RestaurantDetailsforCustomersDTO::new).collect(Collectors.toList());
+	    if (searchName != null && !searchName.isEmpty()) {
+	        String searchLower = searchName.toLowerCase();
+	        return restaurants.stream()
+	            .filter(restaurant -> {
+	                // Match by restaurant name
+	                boolean matchesRestaurant = restaurant.getRestaurantName().toLowerCase().contains(searchLower);
+
+	                // Match by cuisine
+	                boolean matchesCuisine = restaurant.getDishes().stream()
+	                        .anyMatch(dish -> dish.getCusine().equalsIgnoreCase(searchName));
+
+	                // Match by dish name
+	                boolean matchesDish = restaurant.getDishes().stream()
+	                        .anyMatch(dish -> dish.getName().equalsIgnoreCase(searchName));
+
+	                // Include if any match
+	                return matchesRestaurant || matchesCuisine || matchesDish;
+	            })
+	            .map(RestaurantDetailsforCustomersDTO::new)
+	            .collect(Collectors.toList());
+	    } else {
+	        // No searchName: return all in radius
+	        return restaurants.stream()
+	            .map(RestaurantDetailsforCustomersDTO::new)
+	            .collect(Collectors.toList());
+	    }
 	}
 }
