@@ -26,6 +26,7 @@ import com.excelr.FoodDelivery.Models.DTO.DishDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
 import com.excelr.FoodDelivery.Services.DishService;
+import com.excelr.FoodDelivery.Services.OrderService;
 import com.excelr.FoodDelivery.Services.RestaurantService;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
 
@@ -45,6 +46,9 @@ public class RestaurantController {
 	
 	@Autowired
 	private DishService dishService;
+	
+	@Autowired
+    private OrderService orderService;
 	
 	// restaurent details (curd operations)-------------------
 	
@@ -137,8 +141,23 @@ public class RestaurantController {
 	
 	
 	// current orders-------------------
+	@GetMapping("/receiveOrders")
+	public ResponseEntity<?> receiveOrders(Authentication authentication){
+		String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        return ResponseEntity.ok(orderService.getCurrentOrders(restaurant));
+	}
 	
 	// edit accepted orders(declineing with reason)---------------------
+	@PutMapping("/acceptOrRejectOrder")
+	public ResponseEntity<?> acceptOrRejectOrder (Authentication authentication, Long oId, boolean accept){
+		String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        
+        return ResponseEntity.ok(orderService.acceptOrRejectOrder(restaurant.getId(), oId, accept));
+	}
 	
 	// completed order list with filters---------------------
 	
