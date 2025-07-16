@@ -17,6 +17,7 @@ public class RestaurantDetailsDTO {
     private String phone;
     private String profilePic;
     private Boolean enabled;
+    private Boolean open;
     
     public RestaurantDetailsDTO(Restaurant restaurant) {
     	this.id= restaurant.getId();

@@ -1,19 +1,12 @@
 package com.excelr.FoodDelivery.Services;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.excelr.FoodDelivery.Models.Customer;
-import com.excelr.FoodDelivery.Models.Dish;
-import com.excelr.FoodDelivery.Models.Order;
-import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
-import com.excelr.FoodDelivery.Repositories.DishRepository;
-import com.excelr.FoodDelivery.Repositories.OrderRepository;
 import com.excelr.FoodDelivery.Services.Utilities.CloudinaryUtil;
 
 @Service
@@ -49,9 +42,7 @@ public class CustomerService {
         if (update.getLastName() != null) customer.setLastName(update.getLastName());
         if (update.getEmail() != null) customer.setEmail(update.getEmail());
         if (update.getPhone() != null) customer.setPhone(update.getPhone());
-        if (update.getIsEnabled() != null) {
-            customer.setEnabled(update.getIsEnabled());
-        }
+        if (update.getIsEnabled() != null)customer.setEnabled(update.getIsEnabled());
        
         // Do NOT update addresses or password here
 
