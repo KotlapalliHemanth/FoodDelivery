@@ -1,12 +1,13 @@
 package com.excelr.FoodDelivery.Controllers;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.excelr.FoodDelivery.Models.Customer;
+import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Order;
 import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
@@ -204,10 +206,11 @@ public class CustomerController {
     
     // get reataurant details----------------
     @GetMapping("/restaurantDetails")
-    public ResponseEntity<Restaurant> getRestaurantDetails(@RequestParam Long rId){
+    public ResponseEntity<?> getRestaurantDishDetails(@RequestParam Long rId){
     		
     	Restaurant r= restaurantRepo.findById(rId).orElseThrow(() -> new RuntimeException("Customer not found"));
-    	return ResponseEntity.ok(r);
+    	Map<String, List<Dish>> dishes= r.getDishes().stream().filter(Dish::getAvailable).collect(Collectors.groupingBy(Dish::getCusine));
+    	return ResponseEntity.ok(dishes);
     	
     }
     

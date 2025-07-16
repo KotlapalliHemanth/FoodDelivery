@@ -31,13 +31,16 @@ public class AddressService {
 		address.setCountry(a.getCountry());
 		address.setLatitude(a.getLatitude());
 		address.setLongitude(a.getLongitude());
+		address.setLandmark(a.getLandmark());
+		address.setFulladdress(a.getFulladdress());
+		address.setAddressName(a.getAddressName());
 		address.setOwnerType(AddressOwnerType.CUSTOMER);
 		address.setCustomer(c);
 		address.setIsActive(true);
 		return addressRepo.save(address);
 	}
 	
-	public Address createRestaurentAddress(Restaurant c,AddressDTO a) {
+	public Address createRestaurantAddress(Restaurant c,AddressDTO a) {
 		Address address= new Address();
 		
 		address.setStreet(a.getStreet());
@@ -47,6 +50,9 @@ public class AddressService {
 		address.setCountry(a.getCountry());
 		address.setLatitude(a.getLatitude());
 		address.setLongitude(a.getLongitude());
+		address.setFulladdress(a.getFulladdress());
+		address.setAddressName(a.getAddressName());
+		address.setLandmark(a.getLandmark());
 		address.setOwnerType(AddressOwnerType.RESTAURANT);
 		address.setRestaurant(c);
 		address.setIsActive(true);
@@ -65,6 +71,8 @@ public class AddressService {
 		newAddress.setCountry(a.getCountry());
 		newAddress.setLatitude(a.getLatitude());
 		newAddress.setLongitude(a.getLongitude());
+		newAddress.setLandmark(a.getLandmark());
+		newAddress.setFulladdress(a.getFulladdress());
 		newAddress.setAddressName(a.getAddressName());
 	    newAddress.setOwnerType(address.getOwnerType());
 	    if(address.getRestaurant() != null) {

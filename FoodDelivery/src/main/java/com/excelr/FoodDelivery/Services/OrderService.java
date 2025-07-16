@@ -89,4 +89,9 @@ public class OrderService {
 	public List<Order> acceptedOrdersByRestaurant(Long rID){
 		return orderRepo.findAcceptedOrdersByRestaurantId(rID);
 	}
+	
+	//get restaurant finshed orders---------------------
+	public List<Order> getDeliveredOrdersByRestaurant (Long rId){
+		return orderRepo.findDeliveredOrdersByRestaurantId(rId);
+	}
 }
