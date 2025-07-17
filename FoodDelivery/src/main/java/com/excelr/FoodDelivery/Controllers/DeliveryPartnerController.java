@@ -158,7 +158,7 @@ public class DeliveryPartnerController {
 	}
 	
 	// getting all orders delivered by rider for that day------------------------
-	@GetMapping()
+	@GetMapping("/deliveredOrdersByRider")
 	public ResponseEntity<?> getOrdersDelivered(Authentication authentication, 
 			@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 			@RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
