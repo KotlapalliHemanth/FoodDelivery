@@ -30,7 +30,7 @@ public class Restaurant {
     private String resturantPic;
     private String resturantPicPublicId;
     private String googleId;
-    private String Discription;
+    private String description;
     private Boolean open;
     
     private Boolean enabled = true;

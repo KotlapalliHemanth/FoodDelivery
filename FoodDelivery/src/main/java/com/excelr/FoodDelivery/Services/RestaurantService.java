@@ -34,7 +34,7 @@ public class RestaurantService {
             // Upload new image
             CloudinaryUtil.UploadResult result = cloudinaryUtil.uploadImage(newProfilePic);
             restaurant.setResturantPic(result.imageUrl);
-            restaurant.setResturantPicPublicId(null);
+            restaurant.setResturantPicPublicId(result.publicId);
         } 
         
         if (update.getUsername() != null) restaurant.setUsername(update.getUsername());
