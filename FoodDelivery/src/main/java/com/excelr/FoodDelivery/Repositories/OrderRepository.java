@@ -28,5 +28,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "sin(radians(:latitude)) * sin(radians(a.latitude)))) <= 4.0")
     List<Order> findPreparingOrders(@Param("latitude") Double latitude, @Param("longitude") Double longitude);
     
-
+    @Query("SELECT o FROM Order o WHERE o.deliveryPartner.id = :deliveryPartnerId AND o.status = 'PREPARING'")
+    List<Order> findPreparingOrdersByDeliveryPartnerId(@Param("deliveryPartnerId") Long deliveryPartnerId);
 }

@@ -2,6 +2,7 @@ package com.excelr.FoodDelivery.Services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,6 +106,6 @@ public class OrderService {
 	//for rider---------
 	//get available orders( preparing)----------------
 	public List<Order> getPreparingOrders(Double lat, Double lon){
-		return orderRepo.findPreparingOrders(lat, lon);
+		return orderRepo.findPreparingOrders(lat, lon).stream().filter(order->!order.getRiderAssigned()).collect(Collectors.toList());
 	}
 }

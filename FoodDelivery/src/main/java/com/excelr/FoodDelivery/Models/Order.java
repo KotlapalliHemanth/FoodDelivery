@@ -56,6 +56,8 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+    
+    private Boolean riderAssigned = false;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 }

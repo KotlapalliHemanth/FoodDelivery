@@ -24,7 +24,9 @@ import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.DeliveryPartnerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.RiderPositionDTO;
+import com.excelr.FoodDelivery.Models.Enum.OrderStatus;
 import com.excelr.FoodDelivery.Repositories.DeliveryPartnerRepository;
+import com.excelr.FoodDelivery.Repositories.OrderRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
 import com.excelr.FoodDelivery.Services.DeliveryPartnerService;
 import com.excelr.FoodDelivery.Services.OrderService;
@@ -42,6 +44,9 @@ public class DeliveryPartnerController {
 	
 	@Autowired
 	OrderService orderService;
+	
+	@Autowired
+	OrderRepository orderRepo;
 	
 	@Autowired JwtUtill jwtUtil;
 
@@ -96,10 +101,58 @@ public class DeliveryPartnerController {
 	}
 	
 	// order selection and get details(set rider to order) --------------------
+	@PutMapping("/acceptOrder")
+	public ResponseEntity<?> acceptOrderForDelivery(Authentication authentication, @RequestBody Long oId ){
+		String email = authentication.getName();
+        DeliveryPartner rider = riderRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+		
+		Order order = orderRepo.findById(oId)
+				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
+		
+		if(order.getRiderAssigned()== false) {
+			order.setDeliveryPartner(rider);
+			order.setRiderAssigned(true);	
+			orderRepo.save(order);
+			return ResponseEntity.ok("order assigned successfully");
+		}
+		return ResponseEntity.ok("assignment assigned to someone! try another");
+	}
+	
+	
+	// my assigned order--------------------
+	@GetMapping()
+	public ResponseEntity<List<Order>> assignedOrder (Authentication authentication){
+		String email = authentication.getName();
+        DeliveryPartner rider = riderRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        
+        return ResponseEntity.ok(orderRepo.findPreparingOrdersByDeliveryPartnerId(rider.getId()));
+	}
 	
 	// order delivery status change(picked the order)-----------------
+	@PutMapping("/orderPickup")
+	public ResponseEntity<Order> pickOrderFromRestaurant( Authentication authentication, @RequestBody Long oId){
+		Order order = orderRepo.findById(oId)
+				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
+		
+		order.setStatus(OrderStatus.ON_THE_WAY);
+		orderRepo.save(order);
+		return ResponseEntity.ok(orderRepo.save(order));
+	}
 	
 	//order completion list(delivered the order)--------------------
+	@PutMapping("/orderDelivered")
+	public ResponseEntity<Order> deliverOrderToCustomer( Authentication authentication, @RequestBody Long oId){
+		Order order = orderRepo.findById(oId)
+				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
+		
+		order.setStatus(OrderStatus.DELIVERED);
+		orderRepo.save(order);
+		return ResponseEntity.ok(orderRepo.save(order));
+	}
+	
+	// delivery Partner cancelling order due to unknown reasons like accidents etc.,-------------------------------
 	
 	// ratings
 	
