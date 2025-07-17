@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.excelr.FoodDelivery.Models.Address;
 import com.excelr.FoodDelivery.Models.Customer;
+import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.Enum.AddressOwnerType;
-import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Repositories.AddressRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class AddressService {
@@ -56,30 +58,41 @@ public class AddressService {
 		return addressRepo.save(address);
 	}
 
+	@Transactional
 	public Address modifyAddress(AddressDTO a) {
-		Address address = addressRepo.findById(a.getId()).orElseThrow(() -> new RuntimeException("Address not found"));
-		address.setIsActive(false);
-		Address newAddress = new Address();
-		newAddress.setStreet(a.getStreet());
-		newAddress.setState(a.getState());
-		newAddress.setCity(a.getCity());
-		newAddress.setPincode(a.getPincode());
-		newAddress.setCountry(a.getCountry());
-		newAddress.setLatitude(a.getLatitude());
-		newAddress.setLongitude(a.getLongitude());
-		newAddress.setAddressName(a.getAddressName());
-		newAddress.setLandmark(a.getLandmark());
-		newAddress.setFulladdress(a.getFulladdress());
-		newAddress.setOwnerType(address.getOwnerType());
-		if (address.getRestaurant() != null) {
-			newAddress.setRestaurant(address.getRestaurant());
-		}
-		if (address.getCustomer() != null) {
-			newAddress.setCustomer(address.getCustomer());
-		}
-		addressRepo.save(address);
-		return addressRepo.save(newAddress);
+	    Address oldAddress = addressRepo.findById(a.getId())
+	        .orElseThrow(() -> new RuntimeException("Address not found"));
 
+	    // Mark old address as inactive
+	    oldAddress.setIsActive(false);
+	    addressRepo.save(oldAddress);
+
+	    // Create new address
+	    Address newAddress = new Address();
+	    newAddress.setStreet(a.getStreet());
+	    newAddress.setState(a.getState());
+	    newAddress.setCity(a.getCity());
+	    newAddress.setPincode(a.getPincode());
+	    newAddress.setCountry(a.getCountry());
+	    newAddress.setLatitude(a.getLatitude());
+	    newAddress.setLongitude(a.getLongitude());
+	    newAddress.setAddressName(a.getAddressName());
+	    newAddress.setLandmark(a.getLandmark());
+	    newAddress.setFulladdress(a.getFulladdress());
+	    newAddress.setOwnerType(oldAddress.getOwnerType());
+	    newAddress.setIsActive(true);
+
+	    // Link to customer or restaurant
+	    if (oldAddress.getRestaurant() != null) {
+	        newAddress.setRestaurant(oldAddress.getRestaurant());
+	        // Optionally: oldAddress.getRestaurant().getAddresses().add(newAddress);
+	    }
+	    if (oldAddress.getCustomer() != null) {
+	        newAddress.setCustomer(oldAddress.getCustomer());
+	        // Optionally: oldAddress.getCustomer().getAddresses().add(newAddress);
+	    }
+
+	    return addressRepo.save(newAddress);
 	}
 
 	public List<Address> getAddresses(Long id) {
@@ -90,7 +103,7 @@ public class AddressService {
 		Address address = addressRepo.findById(a.getId()).orElseThrow(() -> new RuntimeException("Address not found"));
 
 		address.setIsActive(false);
-
+		addressRepo.save(address);
 	}
 
 }

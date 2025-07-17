@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,8 +28,6 @@ import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
-import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
-import com.excelr.FoodDelivery.Repositories.AddressRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
@@ -158,11 +155,11 @@ public class CustomerController {
         return ResponseEntity.ok(addressService.createCustomerAddress(customer, a));
     }
     
-//    @PutMapping("/address")
-//    public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
-//    	
-//    	return ResponseEntity.ok(addressService.modifyAddress( a));
-//    }
+    @PutMapping("/address")
+    public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	
+    	return ResponseEntity.ok(addressService.modifyAddress( a));
+    }
     
     @DeleteMapping("/address")
     public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a){
@@ -216,18 +213,23 @@ public class CustomerController {
     
     	//get restaurant details--------------------
     @GetMapping("/restaurantAtLocation")
-    public ResponseEntity<?> getRestaurantDetailsByLocation(@RequestParam Double lat, @RequestParam Double lon,@RequestParam Double radius,@RequestParam String searchName){
-    	
-    	return ResponseEntity.ok(restaurantService.findAndFilterRestaurantsByLocation(lat, lon, radius, searchName));
+    public ResponseEntity<?> getRestaurantDetailsByLocation(
+            @RequestParam Double lat,
+            @RequestParam Double lon,
+            @RequestParam Double radius,
+            @RequestParam(required = false, defaultValue = "") String searchName) {
+
+        return ResponseEntity.ok(
+            restaurantService.findAndFilterRestaurantsByLocation(lat, lon, radius, searchName)
+        );
     }
-    
-    // get reataurant details----------------
+
+    // get restaurant details----------------
     @GetMapping("/restaurantDetails")
-    public ResponseEntity<Restaurant> getRestaurantDetails(@RequestParam Long rId){
-    		
-    	Restaurant r= restaurantRepo.findById(rId).orElseThrow(() -> new RuntimeException("Customer not found"));
-    	return ResponseEntity.ok(r);
-    	
+    public ResponseEntity<Restaurant> getRestaurantDetails(@RequestParam Long rId) {
+        Restaurant r = restaurantRepo.findById(rId)
+            .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return ResponseEntity.ok(r);
     }
     
     

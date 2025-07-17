@@ -28,13 +28,13 @@ public class RestaurantService {
 		// Handle profile pic replacement
         if (newProfilePic != null && !newProfilePic.isEmpty()) {
             // Delete old image from Cloudinary if it exists
-            if (restaurant.getProfilePicPublicId() != null) {
-                cloudinaryUtil.deleteImage(restaurant.getProfilePicPublicId());
+            if (restaurant.getResturantPic() != null) {
+                cloudinaryUtil.deleteImage(restaurant.getResturantPicPublicId());
             }
             // Upload new image
             CloudinaryUtil.UploadResult result = cloudinaryUtil.uploadImage(newProfilePic);
-            restaurant.setProfilePic(result.imageUrl);
-            restaurant.setProfilePicPublicId(result.publicId);
+            restaurant.setResturantPic(result.imageUrl);
+            restaurant.setResturantPicPublicId(null);
         } 
         
         if (update.getUsername() != null) restaurant.setUsername(update.getUsername());

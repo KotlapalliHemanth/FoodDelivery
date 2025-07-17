@@ -271,7 +271,7 @@ public class AuthController {
                     r.setEmail(email);
                     r.setPassword(passwordEncoder.encode(googleId));
                     r.setPhone(googleId);
-                    r.setProfilePic(picture);
+                    r.setResturantPic(picture);
                     r.setGoogleId(googleId);
                     r.setEnabled(true);
                     restaurantRepo.save(r);

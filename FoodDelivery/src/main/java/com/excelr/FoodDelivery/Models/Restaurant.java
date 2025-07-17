@@ -27,8 +27,8 @@ public class Restaurant {
     private String email;
     private String phone;
     private String password;
-    private String profilePic;
-    private String profilePicPublicId;
+    private String resturantPic;
+    private String resturantPicPublicId;
     private String googleId;
     private Boolean open;
     
