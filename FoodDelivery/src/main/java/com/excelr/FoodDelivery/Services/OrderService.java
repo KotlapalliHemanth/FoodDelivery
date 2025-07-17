@@ -2,6 +2,7 @@ package com.excelr.FoodDelivery.Services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,5 +89,23 @@ public class OrderService {
 	//accepted order by restaurant---------------
 	public List<Order> acceptedOrdersByRestaurant(Long rID){
 		return orderRepo.findAcceptedOrdersByRestaurantId(rID);
+	}
+	
+	//get restaurant finshed orders---------------------
+	public List<Order> getDeliveredOrdersByRestaurant (Long rId){
+		return orderRepo.findDeliveredOrdersByRestaurantId(rId);
+	}
+	
+	// get order by Id--------------
+	public Order getOrderById(Long oId) {
+		return orderRepo.findById(oId)
+				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
+	}
+	
+	
+	//for rider---------
+	//get available orders( preparing)----------------
+	public List<Order> getPreparingOrders(Double lat, Double lon){
+		return orderRepo.findPreparingOrders(lat, lon).stream().filter(order->!order.getRiderAssigned()).collect(Collectors.toList());
 	}
 }

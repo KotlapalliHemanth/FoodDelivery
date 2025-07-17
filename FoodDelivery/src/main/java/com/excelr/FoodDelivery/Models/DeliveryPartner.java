@@ -33,6 +33,9 @@ public class DeliveryPartner {
      private String profilePicPublicId;
     private String googleId;
     
+    private Double latitude;
+    private Double longitude;
+    
     
     private Boolean enabled = true;
     private LocalDateTime createdAt = LocalDateTime.now();

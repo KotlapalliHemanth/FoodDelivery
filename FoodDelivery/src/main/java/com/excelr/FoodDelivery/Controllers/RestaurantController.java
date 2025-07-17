@@ -22,10 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Restaurant;
+import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.DishDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
+import com.excelr.FoodDelivery.Services.AddressService;
 import com.excelr.FoodDelivery.Services.DishService;
 import com.excelr.FoodDelivery.Services.OrderService;
 import com.excelr.FoodDelivery.Services.RestaurantService;
@@ -50,6 +52,9 @@ public class RestaurantController {
 	
 	@Autowired
     private OrderService orderService;
+	
+	@Autowired
+    private AddressService addressService;
 	
 	// restaurent details (curd operations)-------------------
 	
@@ -175,8 +180,42 @@ public class RestaurantController {
 	
 	// todays order stats---------------------
 	
-	// address curd operations------------------
+	@GetMapping("/deliveredOrders")
+	public ResponseEntity<?> getDeliveredOrdersByRestaurant(Authentication authentication){
+		String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        return ResponseEntity.ok(orderService.getDeliveredOrdersByRestaurant(restaurant.getId()));
+	}
 	
+	// address curd operations------------------
+	@PostMapping("/address")
+    public ResponseEntity<?> addAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        
+        return ResponseEntity.ok(addressService.createRestaurantAddress(restaurant, a));
+    }
+	
+	
+	@PutMapping("/address")
+    public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	
+    	return ResponseEntity.ok(addressService.modifyAddress( a));
+    }
+	
+	@DeleteMapping("/address")
+    public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	addressService.deleteAddress(a);
+    	return ResponseEntity.ok("deleted");	
+	}
+	
+	@GetMapping("/address")
+    public ResponseEntity<?> getAddress(Authentication authentication, @RequestBody AddressDTO a){
+    	
+    	return ResponseEntity.ok(addressService.getAddresses(a.getId()));
+    }
 	
 	
 	// ----------------

@@ -19,6 +19,9 @@ public class DeliveryPartnerDetailsDTO {
     private String googleId;
     private Boolean enabled;
     
+    private Double latitude;
+    private Double longitude;
+    
     public DeliveryPartnerDetailsDTO(DeliveryPartner rider) {
     	this.id= rider.getId();
     	this.username= rider.getUsername();
@@ -31,6 +34,8 @@ public class DeliveryPartnerDetailsDTO {
     	this.profilePic= rider.getProfilePic();
     	this.enabled= rider.getEnabled();
     	this.googleId= rider.getGoogleId();
+    	this.latitude= rider.getLatitude();
+    	this.longitude= rider.getLongitude();
     	
     }
 }

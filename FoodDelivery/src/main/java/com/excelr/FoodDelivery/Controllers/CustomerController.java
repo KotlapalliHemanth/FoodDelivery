@@ -1,6 +1,8 @@
 package com.excelr.FoodDelivery.Controllers;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,12 +24,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.excelr.FoodDelivery.Models.Address;
 import com.excelr.FoodDelivery.Models.Customer;
+import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Order;
 import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
+import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
+import com.excelr.FoodDelivery.Models.DTO.RiderPositionDTO;
+import com.excelr.FoodDelivery.Repositories.AddressRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
@@ -186,7 +192,16 @@ public class CustomerController {
         );
     }
     
+    // getting rider location details----------------
     
+    @GetMapping("/rider")
+    public ResponseEntity<?> getRiderPositionDetails(Authentication authentication, @RequestBody Long oId){
+    	Order order = orderService.getOrderById(oId);
+    	Double lat=order.getDeliveryPartner().getLatitude();
+    	Double lon=order.getDeliveryPartner().getLongitude();
+    	
+    	return ResponseEntity.ok(new RiderPositionDTO(lat, lon));
+    }
     	 
     
     
@@ -226,16 +241,20 @@ public class CustomerController {
 
     // get restaurant details----------------
     @GetMapping("/restaurantDetails")
-    public ResponseEntity<Restaurant> getRestaurantDetails(@RequestParam Long rId) {
-        Restaurant r = restaurantRepo.findById(rId)
-            .orElseThrow(() -> new RuntimeException("Customer not found"));
-        return ResponseEntity.ok(r);
+    public ResponseEntity<?> getRestaurantDishDetails(@RequestParam Long rId){
+    		
+    	Restaurant r= restaurantRepo.findById(rId).orElseThrow(() -> new RuntimeException("Customer not found"));
+    	Map<String, List<Dish>> dishes= r.getDishes().stream().filter(Dish::getAvailable).collect(Collectors.groupingBy(Dish::getCusine));
+    	return ResponseEntity.ok(dishes);
+    	
     }
     
     
     
     //request bodies 
     class PasswordReqBody { public String oldPassword, newPassword; }
+    
+    
     
     class CustomerResponse { 
 		public String token;

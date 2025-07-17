@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.excelr.FoodDelivery.Models.Address;
 import com.excelr.FoodDelivery.Models.Customer;
-import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.Enum.AddressOwnerType;
+import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Repositories.AddressRepository;
 
 import jakarta.transaction.Transactional;
@@ -33,7 +33,7 @@ public class AddressService {
 		address.setLongitude(a.getLongitude());
 		address.setLandmark(a.getLandmark());
 		address.setFulladdress(a.getFulladdress());
-		;
+		address.setAddressName(a.getAddressName());
 		address.setOwnerType(AddressOwnerType.CUSTOMER);
 		address.setCustomer(c);
 		address.setIsActive(true);
@@ -50,6 +50,9 @@ public class AddressService {
 		address.setCountry(a.getCountry());
 		address.setLatitude(a.getLatitude());
 		address.setLongitude(a.getLongitude());
+		address.setFulladdress(a.getFulladdress());
+		address.setAddressName(a.getAddressName());
+		address.setLandmark(a.getLandmark());
 		address.setOwnerType(AddressOwnerType.RESTAURANT);
 		address.setRestaurant(c);
 		address.setLandmark(a.getLandmark());
