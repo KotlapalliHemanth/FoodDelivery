@@ -34,6 +34,7 @@ public class Restaurant {
     private String googleId;
     private String Discription;
     private Boolean open;
+    private Double rating;
     
     private Boolean enabled = true;
     private LocalDateTime createdAt = LocalDateTime.now();
