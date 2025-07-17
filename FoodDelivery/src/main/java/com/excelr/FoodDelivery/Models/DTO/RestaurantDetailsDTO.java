@@ -20,6 +20,7 @@ public class RestaurantDetailsDTO {
     private Boolean open;
     private String googleId;
     private String description;
+    private Double rating;
     
     public RestaurantDetailsDTO(Restaurant restaurant) {
     	this.id= restaurant.getId();
@@ -35,6 +36,7 @@ public class RestaurantDetailsDTO {
     	this.googleId=restaurant.getGoogleId();
     	this.enabled= restaurant.getEnabled();
     	this.description= restaurant.getDescription();
+    	this.rating= restaurant.getRating();
     }
     
 }

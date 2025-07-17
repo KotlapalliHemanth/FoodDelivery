@@ -1,7 +1,5 @@
 package com.excelr.FoodDelivery.Models.DTO;
 
-import java.time.LocalDateTime;
-
 import com.excelr.FoodDelivery.Models.Restaurant;
 
 import lombok.Data;
@@ -18,7 +16,8 @@ public class RestaurantDetailsforCustomersDTO {
     private String email;
     private String phone;
     private String resturantPic;
- 
+    private String description;
+    private Double rating;
     private Boolean open;
     
     public RestaurantDetailsforCustomersDTO(Restaurant r) {
@@ -29,6 +28,9 @@ public class RestaurantDetailsforCustomersDTO {
     	this.phone= r.getPhone();
     	this.resturantPic= r.getResturantPic();
     	this.open= r.getOpen();
+    	this.description= r.getDescription();
+    	this.rating= r.getRating();
+    	
     }
     
     
