@@ -19,4 +19,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o JOIN o.dishes d WHERE o.status = 'DELIVERED' AND d.restaurant.id = :restaurantId")
     List<Order> findDeliveredOrdersByRestaurantId(@Param("restaurantId") Long restaurantId);
+    
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "JOIN o.dishes d JOIN d.restaurant r JOIN r.addresses a " +
+           "WHERE o.status = 'PREPARING' AND " +
+           "(6371 * acos(cos(radians(:latitude)) * cos(radians(a.latitude)) * " +
+           "cos(radians(a.longitude) - radians(:longitude)) + " +
+           "sin(radians(:latitude)) * sin(radians(a.latitude)))) <= 4.0")
+    List<Order> findPreparingOrders(@Param("latitude") Double latitude, @Param("longitude") Double longitude);
+    
+
 }

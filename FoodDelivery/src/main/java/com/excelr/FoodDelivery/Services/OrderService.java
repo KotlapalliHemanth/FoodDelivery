@@ -94,4 +94,17 @@ public class OrderService {
 	public List<Order> getDeliveredOrdersByRestaurant (Long rId){
 		return orderRepo.findDeliveredOrdersByRestaurantId(rId);
 	}
+	
+	// get order by Id--------------
+	public Order getOrderById(Long oId) {
+		return orderRepo.findById(oId)
+				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
+	}
+	
+	
+	//for rider---------
+	//get available orders( preparing)----------------
+	public List<Order> getPreparingOrders(Double lat, Double lon){
+		return orderRepo.findPreparingOrders(lat, lon);
+	}
 }

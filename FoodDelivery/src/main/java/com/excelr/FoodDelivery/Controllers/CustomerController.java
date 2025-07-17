@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.excelr.FoodDelivery.Models.Address;
 import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Order;
@@ -31,6 +32,7 @@ import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
+import com.excelr.FoodDelivery.Models.DTO.RiderPositionDTO;
 import com.excelr.FoodDelivery.Repositories.AddressRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
@@ -167,12 +169,21 @@ public class CustomerController {
     }
     
     @GetMapping("/address")
-    public ResponseEntity<?> getAddress(Authentication authentication, @RequestBody AddressDTO a){
+    public ResponseEntity<List<Address>> getAddress(Authentication authentication, @RequestBody AddressDTO a){
     	
     	return ResponseEntity.ok(addressService.getAddresses(a.getId()));
     }
     
+    // getting rider location details----------------
     
+    @GetMapping("/rider")
+    public ResponseEntity<?> getRiderPositionDetails(Authentication authentication, @RequestBody Long oId){
+    	Order order = orderService.getOrderById(oId);
+    	Double lat=order.getDeliveryPartner().getLatitude();
+    	Double lon=order.getDeliveryPartner().getLongitude();
+    	
+    	return ResponseEntity.ok(new RiderPositionDTO(lat, lon));
+    }
     	 
     
     
@@ -218,6 +229,8 @@ public class CustomerController {
     
     //request bodies 
     class PasswordReqBody { public String oldPassword, newPassword; }
+    
+    
     
     class CustomerResponse { 
 		public String token;
