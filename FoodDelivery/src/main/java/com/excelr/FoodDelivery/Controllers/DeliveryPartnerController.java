@@ -1,9 +1,12 @@
 package com.excelr.FoodDelivery.Controllers;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.id.insert.AbstractReturningDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -149,8 +153,28 @@ public class DeliveryPartnerController {
 		
 		order.setStatus(OrderStatus.DELIVERED);
 		orderRepo.save(order);
+		// if possible add the mailing to user about order with details----------------
 		return ResponseEntity.ok(orderRepo.save(order));
 	}
+	
+	// getting all orders delivered by rider for that day------------------------
+	@GetMapping()
+	public ResponseEntity<?> getOrdersDelivered(Authentication authentication, 
+			@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+			@RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+		String email = authentication.getName();
+        DeliveryPartner rider = riderRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atStartOfDay();
+        
+        List<Order> deliveredOrders= orderRepo.findDeliveredOrdersByRiderForDateRange(rider.getId(),startOfDay, endOfDay );
+        
+        return ResponseEntity.ok(deliveredOrders);
+		
+	}
+	
 	
 	// delivery Partner cancelling order due to unknown reasons like accidents etc.,-------------------------------
 	

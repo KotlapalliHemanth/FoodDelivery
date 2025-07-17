@@ -1,5 +1,6 @@
 package com.excelr.FoodDelivery.Repositories;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,4 +31,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     
     @Query("SELECT o FROM Order o WHERE o.deliveryPartner.id = :deliveryPartnerId AND o.status = 'PREPARING'")
     List<Order> findPreparingOrdersByDeliveryPartnerId(@Param("deliveryPartnerId") Long deliveryPartnerId);
+
+    @Query("SELECT o FROM Order o WHERE o.deliveryPartner.id = :deliveryPartnerId AND o.status = 'DELIVERED' AND o.createdAt >= :startOfDay AND o.createdAt < :endOfDay")
+    List<Order> findDeliveredOrdersByRiderForDateRange(@Param("deliveryPartnerId") Long deliveryPartnerId, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 }
