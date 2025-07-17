@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -153,28 +154,16 @@ public class CustomerController {
     	String email = authentication.getName();
         Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
-        addressService.createCustomerAddress(customer, a);
-        // Always return the updated list of addresses
-        return ResponseEntity.ok(
-        	    customer.getAddresses() != null
-        	        ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
-        	        : List.of()
-        	);
+        
+        return ResponseEntity.ok(addressService.createCustomerAddress(customer, a));
     }
-
-    @PutMapping("/address")
-    public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
-        addressService.modifyAddress(a);
-        String email = authentication.getName();
-        Customer customer = customerRepo.findEnabled(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
-        return ResponseEntity.ok(
-        	    customer.getAddresses() != null
-        	        ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
-        	        : List.of()
-        	);
-    }
-
+    
+//    @PutMapping("/address")
+//    public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
+//    	
+//    	return ResponseEntity.ok(addressService.modifyAddress( a));
+//    }
+    
     @DeleteMapping("/address")
     public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a){
         addressService.deleteAddress(a);
@@ -227,14 +216,14 @@ public class CustomerController {
     
     	//get restaurant details--------------------
     @GetMapping("/restaurantAtLocation")
-    public ResponseEntity<?> getRestaurantDetailsByLocation(Double lat, Double lon, Double radius, String searchName){
+    public ResponseEntity<?> getRestaurantDetailsByLocation(@RequestParam Double lat, @RequestParam Double lon,@RequestParam Double radius,@RequestParam String searchName){
     	
     	return ResponseEntity.ok(restaurantService.findAndFilterRestaurantsByLocation(lat, lon, radius, searchName));
     }
     
     // get reataurant details----------------
     @GetMapping("/restaurantDetails")
-    public ResponseEntity<Restaurant> getRestaurantDetails(Long rId){
+    public ResponseEntity<Restaurant> getRestaurantDetails(@RequestParam Long rId){
     		
     	Restaurant r= restaurantRepo.findById(rId).orElseThrow(() -> new RuntimeException("Customer not found"));
     	return ResponseEntity.ok(r);
