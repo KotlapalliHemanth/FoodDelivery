@@ -21,6 +21,8 @@ public class RestaurantDetailsDTO {
     private String googleId;
     private String description;
     private Double rating;
+    private Double lat;
+    private Double lon;
     
     public RestaurantDetailsDTO(Restaurant restaurant) {
     	this.id= restaurant.getId();
@@ -37,6 +39,9 @@ public class RestaurantDetailsDTO {
     	this.enabled= restaurant.getEnabled();
     	this.description= restaurant.getDescription();
     	this.rating= restaurant.getRating();
+    	
+    	this.lat=restaurant.getAddresses().getLatitude();
+    	this.lon= restaurant.getAddresses().getLongitude();
     }
     
 }
