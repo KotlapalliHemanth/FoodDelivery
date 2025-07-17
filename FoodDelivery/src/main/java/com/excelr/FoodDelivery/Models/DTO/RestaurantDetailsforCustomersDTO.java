@@ -18,7 +18,7 @@ public class RestaurantDetailsforCustomersDTO {
     private String email;
     private String phone;
     private String profilePic;
-    private String discription;
+    private String description;
     private Double rating;
     private Boolean open;
     
@@ -30,7 +30,7 @@ public class RestaurantDetailsforCustomersDTO {
     	this.phone= r.getPhone();
     	this.profilePic= r.getProfilePic();
     	this.open= r.getOpen();
-    	this.discription= r.getDiscription();
+    	this.description= r.getDescription();
     	this.rating= r.getRating();
     	
     }

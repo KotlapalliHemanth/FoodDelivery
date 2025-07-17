@@ -32,7 +32,7 @@ public class Restaurant {
     private String profilePic;
     private String profilePicPublicId;
     private String googleId;
-    private String Discription;
+    private String description;
     private Boolean open;
     private Double rating;
     

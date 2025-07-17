@@ -34,6 +34,16 @@ public class AddressService {
 		address.setLandmark(a.getLandmark());
 		address.setFulladdress(a.getFulladdress());
 		address.setAddressName(a.getAddressName());
+		if(a.getDefaultAddress()) {
+			Address defaultAddress= addressRepo.findByOwnerId(c.getId()).stream().filter(ad->ad.getDefaultAddress()).findFirst()
+						.orElseThrow(() -> new RuntimeException("Address not found"));
+			defaultAddress.setDefaultAddress(false);
+			addressRepo.save(defaultAddress);
+			address.setDefaultAddress(a.getDefaultAddress());
+		
+		}else {
+			address.setDefaultAddress(a.getDefaultAddress());
+		}
 		address.setOwnerType(AddressOwnerType.CUSTOMER);
 		address.setCustomer(c);
 		address.setIsActive(true);
@@ -54,6 +64,7 @@ public class AddressService {
 		address.setAddressName(a.getAddressName());
 		address.setLandmark(a.getLandmark());
 		address.setOwnerType(AddressOwnerType.RESTAURANT);
+		address.setDefaultAddress(true);
 		address.setRestaurant(c);
 		address.setIsActive(true);
 		return addressRepo.save(address);
@@ -80,7 +91,21 @@ public class AddressService {
 		}
 		if(address.getCustomer() != null) {
 		newAddress.setCustomer(address.getCustomer());
+		
+		if(a.getDefaultAddress()) {
+			Address defaultAddress= addressRepo.findByOwnerId(address.getCustomer().getId()).stream().filter(ad->ad.getDefaultAddress()).findFirst()
+						.orElseThrow(() -> new RuntimeException("Address not found"));
+			defaultAddress.setDefaultAddress(false);
+			addressRepo.save(defaultAddress);
+			newAddress.setDefaultAddress(a.getDefaultAddress());
+		
+		}else {
+			newAddress.setDefaultAddress(a.getDefaultAddress());
 		}
+		
+		}
+		
+		
 		addressRepo.save(address);		
 		return addressRepo.save(newAddress);
 	

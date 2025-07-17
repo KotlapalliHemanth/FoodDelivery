@@ -47,6 +47,7 @@ public class Address {
     private Restaurant restaurant;
 
     private Boolean isActive = false;
+    private Boolean defaultAddress = false;
 }
 
 
