@@ -34,7 +34,7 @@ public class RestaurantDetailsDTO {
 		}else {
 			this.phone = restaurant.getPhone();
 		}
-    	this.restaurantPic= restaurant.getProfilePic();
+    	this.restaurantPic= restaurant.getResturantPic();
     	this.googleId=restaurant.getGoogleId();
     	this.enabled= restaurant.getEnabled();
     	this.description= restaurant.getDescription();

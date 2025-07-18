@@ -83,19 +83,24 @@ public class CustomerController {
         Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        
+        Object user = null;
 		CustomerDetailsDTO d = null;
         if(update==null && profilePic==null) { //details not provided(used got getting details)
         	 d = new CustomerDetailsDTO(customer);
-        	System.out.println(d);
+        	 user= customerRepo.findEnabled(d.getEmail())
+                     .orElseThrow(() -> new RuntimeException("customer not found"));
+        	
         }else { //details provided for updating details
         	 d = customerService.updateCustomerDetails(customer, update, profilePic);
+        	 System.out.println(d.getEmail());
+        }
+           user= customerRepo.findEnabled(d.getEmail())
+                   .orElseThrow(() -> new RuntimeException("customer not found"));
             System.out.println(d);
             
-        }
+          
+        System.out.println(d);
         
-        Object user = customerRepo.findEnabled(d.getEmail())
-                .orElseThrow(() -> new RuntimeException("customer not found"));
         
 		String jwt = jwtUtil.generateAccessTokken(user, "CUSTOMER");
         return ResponseEntity.ok(new CustomerResponse(jwt, d));
@@ -164,14 +169,27 @@ public class CustomerController {
     
     @DeleteMapping("/address")
     public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a){
-    	addressService.deleteAddress(a);
-    	return ResponseEntity.ok("deleted");
+        addressService.deleteAddress(a);
+        String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return ResponseEntity.ok(
+        	    customer.getAddresses() != null
+        	        ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
+        	        : List.of()
+        	);
     }
-    
+
     @GetMapping("/address")
-    public ResponseEntity<List<Address>> getAddress(Authentication authentication, @RequestBody AddressDTO a){
-    	
-    	return ResponseEntity.ok(addressService.getAddresses(a.getId()));
+    public ResponseEntity<?> getAddresses(Authentication authentication){
+        String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return ResponseEntity.ok(
+            customer.getAddresses() != null
+                ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
+                : List.of()
+        );
     }
     
     // getting rider location details----------------
@@ -191,7 +209,7 @@ public class CustomerController {
     @PutMapping("/password")
     public ResponseEntity<?> changePassword(Authentication authentication, @RequestBody PasswordReqBody passwordReqBody){
     	String email = authentication.getName();
-        Customer customer = customerRepo.findEnabled(email)
+        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         
         if(passwordEncoder.matches(passwordReqBody.oldPassword, customer.getPassword())) {
@@ -210,12 +228,18 @@ public class CustomerController {
     
     	//get restaurant details--------------------
     @GetMapping("/restaurantAtLocation")
-    public ResponseEntity<?> getRestaurantDetailsByLocation(@RequestParam Double lat, @RequestParam Double lon,@RequestParam Double radius,@RequestParam String searchName){
-    	
-    	return ResponseEntity.ok(restaurantService.findAndFilterRestaurantsByLocation(lat, lon, radius, searchName));
+    public ResponseEntity<?> getRestaurantDetailsByLocation(
+            @RequestParam Double lat,
+            @RequestParam Double lon,
+            @RequestParam Double radius,
+            @RequestParam(required = false, defaultValue = "") String searchName) {
+
+        return ResponseEntity.ok(
+            restaurantService.findAndFilterRestaurantsByLocation(lat, lon, radius, searchName)
+        );
     }
-    
-    // get reataurant details----------------
+
+    // get restaurant details----------------
     @GetMapping("/restaurantDetails")
     public ResponseEntity<?> getRestaurantDishDetails(@RequestParam Long rId){
     		

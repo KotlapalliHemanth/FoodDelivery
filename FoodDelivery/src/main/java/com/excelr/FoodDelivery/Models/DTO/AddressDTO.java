@@ -35,6 +35,7 @@ public class AddressDTO {
 		this.state= a.getState();
 		this.pincode= a.getPincode();
 		this.country= a.getCountry();
+		this.landmark = a.getLandmark();
 		this.latitude= a.getLatitude();
 		this.longitude= a.getLongitude();
 		this.ownerType= a.getOwnerType();

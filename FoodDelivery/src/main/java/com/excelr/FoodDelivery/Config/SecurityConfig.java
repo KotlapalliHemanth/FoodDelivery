@@ -1,10 +1,15 @@
 package com.excelr.FoodDelivery.Config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,9 +28,6 @@ import com.excelr.FoodDelivery.Security.UnifiedUserDetailsService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class SecurityConfig {
@@ -46,7 +48,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+        	.cors(Customizer.withDefaults())
+        	.csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
@@ -56,6 +60,7 @@ public class SecurityConfig {
                     "/swagger-resources/**",
                     "/webjars/**"
                 ).permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/auth/**", "/register/**", "/login/**", "/oauth2/**", "/customer/restaurantDetails", "/customer/restaurantAtLocation").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/restaurant/**").hasRole("RESTAURANT")
@@ -95,7 +100,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:3000")
+                    .allowedOrigins("http://localhost:3000","http://localhost:5173" , "http://localhost:5174" ,"https://p-34-food-del-customer-module.onrender.com") // or your actual frontend domain
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true);
