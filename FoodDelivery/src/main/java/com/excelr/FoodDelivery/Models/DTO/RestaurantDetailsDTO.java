@@ -40,8 +40,14 @@ public class RestaurantDetailsDTO {
     	this.description= restaurant.getDescription();
     	this.rating= restaurant.getRating();
     	
-    	this.lat=restaurant.getAddresses().getLatitude();
-    	this.lon= restaurant.getAddresses().getLongitude();
+    	if(restaurant.getAddresses()!=null) {
+    		this.lat=restaurant.getAddresses().getLatitude();
+        	this.lon= restaurant.getAddresses().getLongitude();
+    	}else {
+    		
+    		this.lat=null;
+        	this.lon= null;
+    	}
     }
     
 }
