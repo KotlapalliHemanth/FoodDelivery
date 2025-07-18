@@ -96,7 +96,15 @@ public class OrderService {
         order.setCreatedAt(java.time.LocalDateTime.now());
         order.setUpdatedAt(java.time.LocalDateTime.now());
         order.setDeliveredAt(null);
-        // Optionally set address and restaurant if you add these fields to Order
+        
+		
+		// Create a pending transaction
+    Transaction txn = new Transaction();
+    txn.setAmount(calculatedAmount);
+    txn.setStatus(PaymentStatus.PENDING);
+    txn.setOrder(order);
+
+    order.setTransaction(txn);
 
         return orderRepo.save(order);
     }
@@ -167,7 +175,7 @@ public class OrderService {
 		return orderRepo.findPreparingOrders(lat, lon).stream().filter(order->!order.getRiderAssigned()).collect(Collectors.toList());
 	}
 
-    public void markOrderPaid(Long orderId, String paymentId, Double amount) {
+    public void recordPaymentSuccess(Long orderId, String paymentId, Double amount, String typeOfPay) {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         Transaction txn = order.getTransaction();
@@ -177,7 +185,7 @@ public class OrderService {
         }
         txn.setTransactionId(paymentId);
         txn.setAmount(amount);
-        txn.setTypeOfPay("RAZORPAY");
+        txn.setTypeOfPay(typeOfPay); // e.g., "UPI", "CREDIT_CARD", "RAZORPAY"
         txn.setStatus(PaymentStatus.PAID);
         txn.setPaidAt(java.time.LocalDateTime.now());
         transactionRepo.save(txn);

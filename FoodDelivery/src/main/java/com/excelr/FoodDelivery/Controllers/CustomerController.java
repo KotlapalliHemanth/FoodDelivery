@@ -226,7 +226,11 @@ public class CustomerController {
 			if (generatedSignature.equals(razorpaySignature)) {
 				// Payment is verified, update order status in DB
 				Order order = orderService.getOrderById(Long.valueOf(orderId));
-				orderService.markOrderPaid(Long.valueOf(orderId), razorpayPaymentId, order.getAmount());
+				RazorpayClient razorpay = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
+				com.razorpay.Payment payment = razorpay.payments.fetch(razorpayPaymentId);
+				String method = payment.get("method"); // "card", "upi", etc.
+
+				orderService.recordPaymentSuccess(Long.valueOf(orderId), razorpayPaymentId, order.getAmount(), method);
 				return ResponseEntity.ok("Payment verified");
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid payment signature");
