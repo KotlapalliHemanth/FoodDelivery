@@ -34,6 +34,16 @@ public class AddressService {
 		address.setLandmark(a.getLandmark());
 		address.setFulladdress(a.getFulladdress());
 		address.setAddressName(a.getAddressName());
+		if(a.getDefaultAddress()) {
+			Address defaultAddress= addressRepo.findByOwnerId(c.getId()).stream().filter(ad->ad.getDefaultAddress()).findFirst()
+						.orElseThrow(() -> new RuntimeException("Address not found"));
+			defaultAddress.setDefaultAddress(false);
+			addressRepo.save(defaultAddress);
+			address.setDefaultAddress(a.getDefaultAddress());
+		
+		}else {
+			address.setDefaultAddress(a.getDefaultAddress());
+		}
 		address.setOwnerType(AddressOwnerType.CUSTOMER);
 		address.setCustomer(c);
 		address.setIsActive(true);
@@ -54,6 +64,7 @@ public class AddressService {
 		address.setAddressName(a.getAddressName());
 		address.setLandmark(a.getLandmark());
 		address.setOwnerType(AddressOwnerType.RESTAURANT);
+		address.setDefaultAddress(true);
 		address.setRestaurant(c);
 		address.setLandmark(a.getLandmark());
 		address.setFulladdress(a.getFulladdress());
@@ -63,43 +74,48 @@ public class AddressService {
 
 	@Transactional
 	public Address modifyAddress(AddressDTO a) {
-	    Address oldAddress = addressRepo.findById(a.getId())
-	        .orElseThrow(() -> new RuntimeException("Address not found"));
-
-	    // Mark old address as inactive
-	    oldAddress.setIsActive(false);
-	    addressRepo.save(oldAddress);
-
-	    // Create new address
-	    Address newAddress = new Address();
-	    newAddress.setStreet(a.getStreet());
-	    newAddress.setState(a.getState());
-	    newAddress.setCity(a.getCity());
-	    newAddress.setPincode(a.getPincode());
-	    newAddress.setCountry(a.getCountry());
-	    newAddress.setLatitude(a.getLatitude());
-	    newAddress.setLongitude(a.getLongitude());
-	    newAddress.setAddressName(a.getAddressName());
-	    newAddress.setLandmark(a.getLandmark());
-	    newAddress.setFulladdress(a.getFulladdress());
-	    newAddress.setOwnerType(oldAddress.getOwnerType());
-	    newAddress.setIsActive(true);
-
-	    // Link to customer or restaurant
-	    if (oldAddress.getRestaurant() != null) {
-	        newAddress.setRestaurant(oldAddress.getRestaurant());
-	        // Optionally: oldAddress.getRestaurant().getAddresses().add(newAddress);
-	    }
-	    if (oldAddress.getCustomer() != null) {
-	        newAddress.setCustomer(oldAddress.getCustomer());
-	        // Optionally: oldAddress.getCustomer().getAddresses().add(newAddress);
-	    }
-
-	    return addressRepo.save(newAddress);
-	}
-
-	public List<Address> getAddresses(Long id) {
-		return addressRepo.findByOwnerId(id);
+		Address address= addressRepo.findById(a.getId())
+					.orElseThrow(() -> new RuntimeException("Address not found"));
+		address.setIsActive(false);
+	 	Address newAddress= new Address();
+		newAddress.setStreet(a.getStreet());
+		newAddress.setState(a.getState());
+		newAddress.setCity(a.getCity());
+		newAddress.setPincode(a.getPincode());
+		newAddress.setCountry(a.getCountry());
+		newAddress.setLatitude(a.getLatitude());
+		newAddress.setLongitude(a.getLongitude());
+		newAddress.setLandmark(a.getLandmark());
+		newAddress.setFulladdress(a.getFulladdress());
+		newAddress.setAddressName(a.getAddressName());
+	    newAddress.setOwnerType(address.getOwnerType());
+	    if(address.getRestaurant() != null) {
+		newAddress.setRestaurant(address.getRestaurant());
+		}
+		if(address.getCustomer() != null) {
+		newAddress.setCustomer(address.getCustomer());
+		
+		if(a.getDefaultAddress()) {
+			Address defaultAddress= addressRepo.findByOwnerId(address.getCustomer().getId()).stream().filter(ad->ad.getDefaultAddress()).findFirst()
+						.orElseThrow(() -> new RuntimeException("Address not found"));
+			defaultAddress.setDefaultAddress(false);
+			addressRepo.save(defaultAddress);
+			newAddress.setDefaultAddress(a.getDefaultAddress());
+		
+		}else {
+			newAddress.setDefaultAddress(a.getDefaultAddress());
+		}
+		
+		}
+		
+		
+		addressRepo.save(address);		
+		return addressRepo.save(newAddress);
+	
+		}
+	
+	public List<Address> getAddresses ( Long id) {
+		return  addressRepo.findByOwnerId(id);
 	}
 
 	public void deleteAddress(AddressDTO a) {

@@ -19,6 +19,8 @@ public class RestaurantDetailsforCustomersDTO {
     private String description;
     private Double rating;
     private Boolean open;
+    private Double lat;
+    private Double lon;
     
     public RestaurantDetailsforCustomersDTO(Restaurant r) {
     	this.id = r.getId();
@@ -30,7 +32,8 @@ public class RestaurantDetailsforCustomersDTO {
     	this.open= r.getOpen();
     	this.description= r.getDescription();
     	this.rating= r.getRating();
-    	
+    	this.lat= r.getAddresses().getLatitude();
+    	this.lon= r.getAddresses().getLongitude();
     }
     
     
