@@ -31,14 +31,14 @@ import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
-import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
+import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsAndAddressDTO;
 import com.excelr.FoodDelivery.Models.DTO.RiderPositionDTO;
-import com.excelr.FoodDelivery.Repositories.AddressRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
 import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
 import com.excelr.FoodDelivery.Services.AddressService;
 import com.excelr.FoodDelivery.Services.CustomerService;
+import com.excelr.FoodDelivery.Services.DishService;
 import com.excelr.FoodDelivery.Services.OrderService;
 import com.excelr.FoodDelivery.Services.RestaurantService;
 
@@ -70,6 +70,9 @@ public class CustomerController {
     
     @Autowired 
     JwtUtill jwtUtil;
+
+    @Autowired
+    private DishService dishService;
 
     
 //  api for  details
@@ -111,13 +114,29 @@ public class CustomerController {
     
     // get all users
     @GetMapping("/orders")
-    public ResponseEntity<List<Order>> getUserOrders(Authentication authentication) {
+    public ResponseEntity<List<OrderWithRestaurantDTO>> getUserOrders(Authentication authentication) {
         String email = authentication.getName();
         Customer customer = customerRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         List<Order> orders = customer.getOrders();
-        return ResponseEntity.ok(orders);
+        List<OrderWithRestaurantDTO> result = orders.stream().map(order -> {
+        	RestaurantDetailsAndAddressDTO restaurantDetails = null;
+            try {
+                if (order.getDishes() != null && !order.getDishes().isEmpty()) {
+                    Long firstDishId = order.getDishes().get(0).getId();
+                    restaurantDetails = dishService.findRestaurant(firstDishId);
+                    return new OrderWithRestaurantDTO(order, restaurantDetails);
+                } else {
+                    return new OrderWithRestaurantDTO(order, "No dishes found in order");
+                }
+            } catch (Exception e) {
+                // Log the error and return a DTO with the error message
+                e.printStackTrace();
+                return new OrderWithRestaurantDTO(order, "Failed to fetch restaurant details: " + e.getMessage());
+            }
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
 
     
@@ -165,6 +184,17 @@ public class CustomerController {
     public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a){
     	
     	return ResponseEntity.ok(addressService.modifyAddress( a));
+    }
+    
+    @PutMapping("/address/default")
+    public ResponseEntity<?> setDefaultAddress(
+            Authentication authentication,
+            @RequestParam Long addressId) {
+        String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        addressService.setDefaultAddress(customer.getId(), addressId);
+        return ResponseEntity.ok("Default address updated");
     }
     
     @DeleteMapping("/address")
@@ -253,7 +283,23 @@ public class CustomerController {
     
     //request bodies 
     class PasswordReqBody { public String oldPassword, newPassword; }
-    
+
+    public static class OrderWithRestaurantDTO {
+        public Order order;
+        public RestaurantDetailsAndAddressDTO restaurantDetails;
+        public String errorMessage;
+
+        public OrderWithRestaurantDTO(Order order, RestaurantDetailsAndAddressDTO restaurantDetails) {
+            this.order = order;
+            this.restaurantDetails = restaurantDetails;
+            this.errorMessage = null;
+        }
+        public OrderWithRestaurantDTO(Order order, String errorMessage) {
+            this.order = order;
+            this.restaurantDetails = null;
+            this.errorMessage = errorMessage;
+        }
+    }
     
     
     class CustomerResponse { 
