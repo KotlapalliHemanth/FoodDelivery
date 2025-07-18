@@ -24,6 +24,7 @@ public class AddressDTO {
     private String landmark;
     private Double latitude;
     private Double longitude;
+    private Boolean isActive;
     private Boolean defaultAddress;
     private AddressOwnerType ownerType;
     
@@ -42,6 +43,7 @@ public class AddressDTO {
 		this.AddressName= a.getAddressName();
 		this.landmark= a.getLandmark();
 		this.ownerType= a.getOwnerType();
+		this.isActive = a.getIsActive();
 		this.defaultAddress= a.getDefaultAddress();
 	}
 }
