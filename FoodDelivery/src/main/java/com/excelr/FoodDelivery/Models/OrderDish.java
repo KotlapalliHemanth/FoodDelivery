@@ -1,4 +1,4 @@
-package com.excelr.FoodDelivery.Models;
+ package com.excelr.FoodDelivery.Models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;

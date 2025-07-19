@@ -18,6 +18,7 @@ public class DeliveryPartnerDetailsDTO {
     private String profilePicPublicId;
     private String googleId;
     private Boolean enabled;
+    private String fullname;
     
     private Double latitude;
     private Double longitude;
@@ -25,6 +26,7 @@ public class DeliveryPartnerDetailsDTO {
     public DeliveryPartnerDetailsDTO(DeliveryPartner rider) {
     	this.id= rider.getId();
     	this.username= rider.getUsername();
+    	this.fullname = rider.getUsername();
     	this.email= rider.getEmail();
     	if(rider.getPhone().equals(rider.getGoogleId())) {
 			this.phone = "";
