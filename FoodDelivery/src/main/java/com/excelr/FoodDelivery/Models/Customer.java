@@ -18,7 +18,8 @@ import lombok.ToString;
 @Data
 @Entity
 @Table(name = "customers")
-@ToString(exclude = "addresses")
+@ToString(exclude = {"addresses","orders"})
+
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

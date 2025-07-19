@@ -127,18 +127,21 @@ public class CustomerController {
 		List<Order> orders = customer.getOrders();
 		List<OrderWithRestaurantDTO> result = orders.stream().map(order -> {
 			RestaurantDetailsAndAddressDTO restaurantDetails = null;
+			List<DishWithQuantityDTO> dishWithQuantities = order.getOrderDishes().stream()
+				.map(od -> new DishWithQuantityDTO(od.getDish(), od.getQuantity()))
+				.collect(Collectors.toList());
 			try {
-				if (order.getDishes() != null && !order.getDishes().isEmpty()) {
-					Long firstDishId = order.getDishes().get(0).getId();
+				if (order.getOrderDishes() != null && !order.getOrderDishes().isEmpty()) {
+					Long firstDishId = order.getOrderDishes().get(0).getDish().getId();
 					restaurantDetails = dishService.findRestaurant(firstDishId);
-					return new OrderWithRestaurantDTO(order, restaurantDetails);
+					return new OrderWithRestaurantDTO(order, restaurantDetails, dishWithQuantities);
 				} else {
-					return new OrderWithRestaurantDTO(order, "No dishes found in order");
+					return new OrderWithRestaurantDTO(order, "No dishes found in order", dishWithQuantities);
 				}
 			} catch (Exception e) {
 				// Log the error and return a DTO with the error message
 				e.printStackTrace();
-				return new OrderWithRestaurantDTO(order, "Failed to fetch restaurant details: " + e.getMessage());
+				return new OrderWithRestaurantDTO(order, "Failed to fetch restaurant details: " + e.getMessage(), dishWithQuantities);
 			}
 		}).collect(Collectors.toList());
 		return ResponseEntity.ok(result);
@@ -348,17 +351,43 @@ public class CustomerController {
 		public Order order;
 		public RestaurantDetailsAndAddressDTO restaurantDetails;
 		public String errorMessage;
+		public List<DishWithQuantityDTO> dishes;
 
-		public OrderWithRestaurantDTO(Order order, RestaurantDetailsAndAddressDTO restaurantDetails) {
+		public OrderWithRestaurantDTO(Order order, RestaurantDetailsAndAddressDTO restaurantDetails, List<DishWithQuantityDTO> dishes) {
 			this.order = order;
 			this.restaurantDetails = restaurantDetails;
 			this.errorMessage = null;
+			this.dishes = dishes;
 		}
-
-		public OrderWithRestaurantDTO(Order order, String errorMessage) {
+		public OrderWithRestaurantDTO(Order order, String errorMessage, List<DishWithQuantityDTO> dishes) {
 			this.order = order;
 			this.restaurantDetails = null;
 			this.errorMessage = errorMessage;
+			this.dishes = dishes;
+		}
+	}
+
+	public static class DishWithQuantityDTO {
+		public Long dishId;
+		public String name;
+		public Double price;
+		public String category;
+		public String cuisine;
+		public String description;
+		public Boolean available;
+		public String image;
+		public int quantity;
+
+		public DishWithQuantityDTO(Dish dish, int quantity) {
+			this.dishId = dish.getId();
+			this.name = dish.getName();
+			this.price = dish.getPrice();
+			this.category = dish.getCategory();
+			this.cuisine = dish.getCusine();
+			this.description = dish.getDescription();
+			this.available = dish.getAvailable();
+			this.image = dish.getImage();
+			this.quantity = quantity;
 		}
 	}
 

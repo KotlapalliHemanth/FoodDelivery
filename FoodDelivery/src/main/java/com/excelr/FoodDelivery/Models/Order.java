@@ -1,11 +1,8 @@
 package com.excelr.FoodDelivery.Models;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.excelr.FoodDelivery.Models.Enum.OrderStatus;
-import com.excelr.FoodDelivery.Models.Enum.PaymentStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -17,16 +14,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
 @Table(name = "orders")
+@ToString(exclude = {"customer", "deliveryPartner", "transaction", "orderDishes"})
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,13 +43,8 @@ public class Order {
     @JoinColumn(name = "transaction_id", referencedColumnName = "id") // Creates the foreign key column
     private Transaction transaction;
 
-    @ManyToMany
-    @JoinTable(
-        name = "order_dishes",
-        joinColumns = @JoinColumn(name = "order_id"),
-        inverseJoinColumns = @JoinColumn(name = "dish_id")
-    )
-    private List<Dish> dishes;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<OrderDish> orderDishes;
 
     private Double amount;
 
