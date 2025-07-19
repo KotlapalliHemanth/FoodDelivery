@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.excelr.FoodDelivery.Models.Enum.OrderStatus;
+import com.excelr.FoodDelivery.Models.Enum.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -37,7 +38,7 @@ public class Order {
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_partner_id", nullable = false)
+    @JoinColumn(name = "delivery_partner_id", nullable = true)
     private DeliveryPartner deliveryPartner;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -56,8 +57,13 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    
+
     private Boolean riderAssigned = false;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+
+    private LocalDateTime updatedAt;
+
+    private LocalDateTime deliveredAt;
+
+    private LocalDateTime createdAt;
 }
