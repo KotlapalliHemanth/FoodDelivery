@@ -85,10 +85,9 @@ public class DeliveryPartnerController {
     }
 	
 	// get available orders (near by 5km radius)-----------------
-	@GetMapping("/getAvailableOrders")
+	@PostMapping("/getAvailableOrders")
 	public ResponseEntity<List<Order>> getPreparingOrders(Authentication authentication, @RequestBody RiderPositionDTO position ){
-		
-		return ResponseEntity.ok(orderService.getPreparingOrders(position.getLat(), position.getLon()));
+	    return ResponseEntity.ok(orderService.getPreparingOrders(position.getLat(), position.getLon()));
 	}
 	
 	//update rider location(lat, lon)-----------------

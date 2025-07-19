@@ -2,25 +2,25 @@ package com.excelr.FoodDelivery.Security.Jwt;
 
 import java.security.Key;
 import java.util.Date;
-
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Admin;
-import com.excelr.FoodDelivery.Models.Restaurant;
+import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.DeliveryPartner;
-import com.excelr.FoodDelivery.Repositories.CustomerRepository;
+import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Repositories.AdminRepository;
-import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
+import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.DeliveryPartnerRepository;
+import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 
 @Component
@@ -55,24 +55,29 @@ public class JwtUtill {
 
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", role)
+                .claim("roles", List.of(role)) // <-- Use array
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
-    
+
     public boolean validateToken(String Token) {
         Claims claim = getAllClaimsFromToken(Token);
         String subject = claim.getSubject();
-        String role = claim.get("role", String.class);
+        List<String> roles = claim.get("roles", List.class);
 
         boolean userExists = false;
-        switch (role) {
-            case "CUSTOMER" -> userExists = customerRepo.findEnabled(subject).isPresent();
-            case "ADMIN" -> userExists = adminRepo.findEnabled(subject).isPresent();
-            case "RESTAURANT" -> userExists = restaurantRepo.findEnabled(subject).isPresent();
-            case "RIDER", "DELIVERYPARTNER" -> userExists = deliveryPartnerRepo.findEnabled(subject).isPresent();
+        if (roles != null) {
+            for (String role : roles) {
+                switch (role) {
+                    case "CUSTOMER" -> userExists = customerRepo.findEnabled(subject).isPresent();
+                    case "ADMIN" -> userExists = adminRepo.findEnabled(subject).isPresent();
+                    case "RESTAURANT" -> userExists = restaurantRepo.findEnabled(subject).isPresent();
+                    case "RIDER", "DELIVERYPARTNER" -> userExists = deliveryPartnerRepo.findEnabled(subject).isPresent();
+                }
+                if (userExists) break;
+            }
         }
 
         if (claim.getExpiration().before(new Date())) {

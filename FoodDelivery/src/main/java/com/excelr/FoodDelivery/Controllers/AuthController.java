@@ -1,5 +1,7 @@
 package com.excelr.FoodDelivery.Controllers;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -269,7 +271,7 @@ public class AuthController {
                     r.setEmail(email);
                     r.setPassword(passwordEncoder.encode(googleId));
                     r.setPhone(googleId);
-                    r.setProfilePic(picture);
+                    r.setResturantPic(picture);
                     r.setGoogleId(googleId);
                     r.setEnabled(true);
                     restaurantRepo.save(r);
@@ -302,7 +304,17 @@ public class AuthController {
         }
 
         String jwt = jwtUtil.generateAccessTokken(user, role);
-        return ResponseEntity.ok(new JwtResponse(jwt));
+        String html = "<!DOCTYPE html><html><body><script>"
+        	    + "window.opener.postMessage({token: '" + jwt + "'}, '*');"
+        	    + "window.close();"
+        	    + "</script></body></html>";
+        	response.setContentType("text/html");
+        	try {
+				response.getWriter().write(html);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        	return null;
     }
     
     

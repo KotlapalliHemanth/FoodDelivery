@@ -1,7 +1,6 @@
 package com.excelr.FoodDelivery.Controllers;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +18,18 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.excelr.FoodDelivery.Models.Customer;
 import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.AddressDTO;
-import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.DishDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
+import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
 import com.excelr.FoodDelivery.Services.AddressService;
 import com.excelr.FoodDelivery.Services.DishService;
 import com.excelr.FoodDelivery.Services.OrderService;
 import com.excelr.FoodDelivery.Services.RestaurantService;
-import com.excelr.FoodDelivery.Security.Jwt.JwtUtill;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @RestController
@@ -58,6 +56,7 @@ public class RestaurantController {
 	
 	// restaurent details (curd operations)-------------------
 	
+
 	@PostMapping(value = "/details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RestaurantResponse> getAndUpdateUserProfile(
             Authentication authentication,
@@ -195,7 +194,7 @@ public class RestaurantController {
         Restaurant restaurant = restaurantRepo.findEnabled(email)
                 .orElseThrow(() -> new RuntimeException("restaurant not found"));
         
-        return ResponseEntity.ok(addressService.createRestaurantAddress(restaurant, a));
+        return ResponseEntity.ok(addressService.createRestaurentAddress(restaurant, a));
     }
 	
 	

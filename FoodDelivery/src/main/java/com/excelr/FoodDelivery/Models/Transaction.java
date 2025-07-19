@@ -14,10 +14,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
 @Table(name = "transactions")
+@ToString(exclude= {"order"})
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,12 +1,10 @@
 package com.excelr.FoodDelivery.Models.DTO;
 
-import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.Address;
-
+import com.excelr.FoodDelivery.Models.Restaurant;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @NoArgsConstructor
 public class RestaurantDetailsAndAddressDTO {
