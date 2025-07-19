@@ -56,34 +56,34 @@ public class RestaurantController {
 	
 	// restaurent details (curd operations)-------------------
 	
-	
+
 	@PostMapping(value = "/details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<RestaurantResponse> getAndUpdateUserProfile(
-	        Authentication authentication,
-	        @RequestPart(value = "update", required = false) String updateStr,
-	        @RequestPart(required = false) MultipartFile profilePic) throws Exception {
+    public ResponseEntity<RestaurantResponse> getAndUpdateUserProfile(
+            Authentication authentication,
+            @RequestPart(required = false) RestaurantDetailsDTO update,
+            @RequestPart(required = false) MultipartFile profilePic) throws Exception {
 
-	    String email = authentication.getName();
-	    Restaurant restaurant = restaurantRepo.findEnabled(email)
-	            .orElseThrow(() -> new RuntimeException("restaurant not found"));
+    	String email = authentication.getName();
+        Restaurant restaurant = restaurantRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
 
-	    ObjectMapper mapper = new ObjectMapper();
-	    RestaurantDetailsDTO update = (updateStr != null) ? mapper.readValue(updateStr, RestaurantDetailsDTO.class) : null;
-
-	    RestaurantDetailsDTO d;
-	    if (update == null && profilePic == null) {
-	        d = new RestaurantDetailsDTO(restaurant);
-	    } else {
-	        d = restaurantService.updateRestaurantDetails(restaurant, update, profilePic);
-	    }
-
-	    Restaurant updated = restaurantRepo.findEnabled(d.getEmail())
-	            .orElseThrow(() -> new RuntimeException("restaurant not found"));
-
-	    String jwt = jwtUtil.generateAccessTokken(updated, "RESTAURANT");
-	    return ResponseEntity.ok(new RestaurantResponse(jwt, d));
-	}
-
+        RestaurantDetailsDTO d = null;
+        if(update==null && profilePic==null) { //details not provided(used got getting details)
+        	 d = new RestaurantDetailsDTO(restaurant);
+        	System.out.println(d);
+        }else{ //details provided for updating details
+        	 d = restaurantService.updateRestaurantDetails(restaurant, update, profilePic);
+            System.out.println(restaurant);
+            
+        }
+        
+        Object user = restaurantRepo.findEnabled(d.getEmail())
+                .orElseThrow(() -> new RuntimeException("restaurant not found"));
+        
+		String jwt = jwtUtil.generateAccessTokken(user, "RESTAURANT");
+//        return ResponseEntity.ok(new JwtResponse(jwt));
+        return ResponseEntity.ok(new RestaurantResponse(jwt, d));
+    }
 	
 	// add & edit items-----------------------
 	@PostMapping(value="/dishadd", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

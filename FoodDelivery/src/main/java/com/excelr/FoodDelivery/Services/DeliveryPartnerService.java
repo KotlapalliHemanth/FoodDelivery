@@ -36,10 +36,12 @@ public class DeliveryPartnerService {
         } 
 
 
-        if (update.getUsername() != null) rider.setUsername(update.getUsername());
-        if (update.getEmail() != null) rider.setEmail(update.getEmail());
-        if (update.getPhone() != null) rider.setPhone(update.getPhone());
-        if (update.getEnabled() != null) rider.setEnabled(update.getEnabled());
+        if(update!=null) {
+        	if (update.getUsername() != null) rider.setUsername(update.getUsername());
+            if (update.getEmail() != null) rider.setEmail(update.getEmail());
+            if (update.getPhone() != null) rider.setPhone(update.getPhone());
+            if (update.getEnabled() != null) rider.setEnabled(update.getEnabled());
+        }
        
         // Do NOT update addresses or password here
 

@@ -36,12 +36,14 @@ public class CustomerService {
         } 
 
 
-        if (update.getUsername() != null) customer.setUsername(update.getUsername());
-        if (update.getFirstName() != null) customer.setFirstName(update.getFirstName());
-        if (update.getLastName() != null) customer.setLastName(update.getLastName());
-        if (update.getEmail() != null) customer.setEmail(update.getEmail());
-        if (update.getPhone() != null) customer.setPhone(update.getPhone());
-        if (update.getIsEnabled() != null)customer.setEnabled(update.getIsEnabled());
+       if(update!=null) {
+    	   if (update.getUsername() != null) customer.setUsername(update.getUsername());
+           if (update.getFirstName() != null) customer.setFirstName(update.getFirstName());
+           if (update.getLastName() != null) customer.setLastName(update.getLastName());
+           if (update.getEmail() != null) customer.setEmail(update.getEmail());
+           if (update.getPhone() != null) customer.setPhone(update.getPhone());
+           if (update.getIsEnabled() != null)customer.setEnabled(update.getIsEnabled());
+       }
        
         // Do NOT update addresses or password here
 
