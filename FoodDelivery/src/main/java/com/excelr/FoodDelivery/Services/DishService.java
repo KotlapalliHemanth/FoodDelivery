@@ -1,12 +1,16 @@
 package com.excelr.FoodDelivery.Services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.excelr.FoodDelivery.Models.Address;
 import com.excelr.FoodDelivery.Models.Dish;
 import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.DishDTO;
+import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsAndAddressDTO;
 import com.excelr.FoodDelivery.Repositories.DishRepository;
 import com.excelr.FoodDelivery.Services.Utilities.CloudinaryUtil;
 
@@ -18,6 +22,8 @@ public class DishService {
 	
 	@Autowired
 	DishRepository dishRepo;
+	@Autowired
+    private AddressService addressService;
 	
 	public DishDTO createDish (Restaurant r, DishDTO d, MultipartFile newProfilePic ) throws Exception {
 		Dish dish= new Dish();
@@ -79,6 +85,18 @@ public class DishService {
 				.orElseThrow(() -> new RuntimeException("dish already not found"));
 		dA.setDeleted(true);
 		dishRepo.save(dA);
+		
+	}
+	
+	public RestaurantDetailsAndAddressDTO findRestaurant (Long dId)throws Exception {
+		Dish dA = dishRepo.findById(dId)
+				.orElseThrow(() -> new RuntimeException("dish already not found"));
+		
+		Restaurant r= dA.getRestaurant();
+		
+		List<Address> rAddress= addressService.getAddresses(r.getId());
+		
+		return new RestaurantDetailsAndAddressDTO(r, rAddress.getFirst());
 		
 	}
 	

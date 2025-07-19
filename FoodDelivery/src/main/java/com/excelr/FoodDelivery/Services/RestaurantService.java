@@ -37,13 +37,16 @@ public class RestaurantService {
             restaurant.setProfilePicPublicId(result.publicId);
         } 
         
-        if (update.getUsername() != null) restaurant.setUsername(update.getUsername());
-        if (update.getRestaurantName() != null) restaurant.setRestaurantName(update.getRestaurantName());
-        
-        if (update.getEmail() != null) restaurant.setEmail(update.getEmail());
-        if (update.getPhone() != null) restaurant.setPhone(update.getPhone());
-        if (update.getEnabled() != null) restaurant.setEnabled(update.getEnabled());
-        if (update.getOpen() != null) restaurant.setOpen(update.getOpen());
+        if(update!=null) {
+        	if (update.getUsername() != null) restaurant.setUsername(update.getUsername());
+            if (update.getRestaurantName() != null) restaurant.setRestaurantName(update.getRestaurantName());
+            if (update.getDescription()!=null) restaurant.setDescription(update.getDescription());
+            if (update.getRating()!=null) restaurant.setRating(update.getRating());
+            if (update.getEmail() != null) restaurant.setEmail(update.getEmail());
+            if (update.getPhone() != null) restaurant.setPhone(update.getPhone());
+            if (update.getEnabled() != null) restaurant.setEnabled(update.getEnabled());
+            if (update.getOpen() != null) restaurant.setOpen(update.getOpen());
+        }
         
         Restaurant r= restaurantRepo.save(restaurant);
         return new RestaurantDetailsDTO(r);
