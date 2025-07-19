@@ -1,3 +1,4 @@
+
 package com.excelr.FoodDelivery.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,10 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
 @Table(name = "dishes")
+@ToString(exclude= {"restaurant"})
 public class Dish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

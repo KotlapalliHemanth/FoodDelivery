@@ -26,7 +26,7 @@ public class DeliveryPartnerDetailsDTO {
     	this.id= rider.getId();
     	this.username= rider.getUsername();
     	this.email= rider.getEmail();
-    	if(rider.getPhone()==rider.getGoogleId()) {
+    	if(rider.getPhone().equals(rider.getGoogleId())) {
 			this.phone = "";
 		}else {
 			this.phone = rider.getPhone();

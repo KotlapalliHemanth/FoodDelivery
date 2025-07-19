@@ -24,7 +24,7 @@ public class CustomerDetailsDTO {
 		this.lastName = customer.getLastName();
 		this.username = customer.getUsername();
 		this.email = customer.getEmail();
-		if(customer.getPhone()==customer.getGoogleId()) {
+		if(customer.getPhone().equals(customer.getGoogleId())) {
 			this.phone = "";
 		}else {
 			this.phone = customer.getPhone();

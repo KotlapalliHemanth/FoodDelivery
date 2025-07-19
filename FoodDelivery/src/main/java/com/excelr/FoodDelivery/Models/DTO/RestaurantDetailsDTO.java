@@ -29,7 +29,7 @@ public class RestaurantDetailsDTO {
     	this.username= restaurant.getUsername();
     	this.restaurantName= restaurant.getRestaurantName();
     	this.email= restaurant.getEmail();
-    	if(restaurant.getPhone()==restaurant.getGoogleId()) {
+    	if(restaurant.getPhone().equals(restaurant.getGoogleId())) {
 			this.phone = "";
 		}else {
 			this.phone = restaurant.getPhone();
