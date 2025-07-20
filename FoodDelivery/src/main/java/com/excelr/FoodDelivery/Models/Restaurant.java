@@ -44,4 +44,5 @@ public class Restaurant {
 
     @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private Address addresses;
+
 }

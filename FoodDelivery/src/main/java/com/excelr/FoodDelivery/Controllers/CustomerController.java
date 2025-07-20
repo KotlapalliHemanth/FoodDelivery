@@ -53,29 +53,29 @@ import com.razorpay.Utils;
 @PreAuthorize("hasRole('CUSTOMER')")
 public class CustomerController {
 
-	@Autowired
-	private CustomerRepository customerRepo;
+    @Autowired
+    private CustomerRepository customerRepo;
+    
+    @Autowired
+    private RestaurantService restaurantService;
+    
+    @Autowired
+    private RestaurantRepository restaurantRepo;
+    
+    @Autowired
+    private AddressService addressService;
 
-	@Autowired
-	private RestaurantService restaurantService;
-
-	@Autowired
-	private RestaurantRepository restaurantRepo;
-
-	@Autowired
-	private AddressService addressService;
-
-	@Autowired
-	private CustomerService customerService;
-
-	@Autowired
-	private OrderService orderService;
-
-	@Autowired
-	PasswordEncoder passwordEncoder;
-
-	@Autowired
-	JwtUtill jwtUtil;
+    @Autowired
+    private CustomerService customerService;
+    
+    @Autowired
+    private OrderService orderService;
+    
+    @Autowired 
+    PasswordEncoder passwordEncoder;
+    
+    @Autowired 
+    JwtUtill jwtUtil;
 
 	@Autowired
 	private DishService dishService;
@@ -85,46 +85,46 @@ public class CustomerController {
 
 	@Value("${razorpay.key.secret}")
 	private String razorpayKeySecret;
-
+    
 //  api for  details
-	@PostMapping(value = "/details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<CustomerResponse> getAndUpdateUserProfile(Authentication authentication,
-			@RequestPart(required = false) CustomerDetailsDTO update,
-			@RequestPart(required = false) MultipartFile profilePic) throws Exception {
+            @RequestPart(required = false) CustomerDetailsDTO update,
+            @RequestPart(required = false) MultipartFile profilePic) throws Exception {
 
-		String email = authentication.getName();
-		Customer customer = customerRepo.findEnabled(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
+    	String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-		Object user = null;
+        Object user = null;
 		CustomerDetailsDTO d = null;
 		if (update == null && profilePic == null) { // details not provided(used got getting details)
-			d = new CustomerDetailsDTO(customer);
+        	 d = new CustomerDetailsDTO(customer);
 			user = customerRepo.findEnabled(d.getEmail()).orElseThrow(() -> new RuntimeException("customer not found"));
-
+        	
 		} else { // details provided for updating details
-			d = customerService.updateCustomerDetails(customer, update, profilePic);
-			System.out.println(d.getEmail());
-		}
+        	 d = customerService.updateCustomerDetails(customer, update, profilePic);
+        	 System.out.println(d.getEmail());
+        }
 		user = customerRepo.findEnabled(d.getEmail()).orElseThrow(() -> new RuntimeException("customer not found"));
-		System.out.println(d);
-
-		System.out.println(d);
-
+            System.out.println(d);
+          
+        System.out.println(d);
+        
 		String jwt = jwtUtil.generateAccessTokken(user, "CUSTOMER");
-		return ResponseEntity.ok(new CustomerResponse(jwt, d));
-	}
-
-	// curd operations on orders
-
-	// get all users
-	@GetMapping("/orders")
+        return ResponseEntity.ok(new CustomerResponse(jwt, d));
+    }
+    
+    // curd operations on orders
+    
+    // get all users
+    @GetMapping("/orders")
 	public ResponseEntity<List<OrderWithRestaurantDTO>> getUserOrders(Authentication authentication) {
-		String email = authentication.getName();
-		Customer customer = customerRepo.findEnabled(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
+        String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-		List<Order> orders = customer.getOrders();
+        List<Order> orders = customer.getOrders();
 		List<OrderWithRestaurantDTO> result = orders.stream().map(order -> {
 			RestaurantDetailsAndAddressDTO restaurantDetails = null;
 			List<DishWithQuantityDTO> dishWithQuantities = order.getOrderDishes().stream()
@@ -142,37 +142,37 @@ public class CustomerController {
 				// Log the error and return a DTO with the error message
 				e.printStackTrace();
 				return new OrderWithRestaurantDTO(order, "Failed to fetch restaurant details: " + e.getMessage(), dishWithQuantities);
-			}
+    }
 		}).collect(Collectors.toList());
 		return ResponseEntity.ok(result);
 	}
-
+    
 	// create order for the payments
-	@PostMapping("/orders")
-	public ResponseEntity<Order> createOrder(Authentication authentication, @RequestBody CreateOrderDTO req) {
-		String email = authentication.getName();
-		Customer customer = customerRepo.findEnabled(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
+    @PostMapping("/orders")
+    public ResponseEntity<Order> createOrder(Authentication authentication, @RequestBody CreateOrderDTO req) {
+        String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-		// Assuming you have a method to create an order
-		Order newOrder = orderService.createOrder(customer, req);
-		if (newOrder == null) {
-			return ResponseEntity.badRequest().build();
-		}
-		return ResponseEntity.ok(newOrder);
-	}
-
-	// update the order
-	@PutMapping("/orders")
+        // Assuming you have a method to create an order
+        Order newOrder = orderService.createOrder(customer, req);
+        if (newOrder == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(newOrder);
+    }
+    
+    // update the order
+    @PutMapping("/orders")
 	public ResponseEntity<Order> modifyOrder(Authentication authentication, @RequestBody ModifyOrderDTO req) {
-		String email = authentication.getName();
-		Customer customer = customerRepo.findEnabled(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
-
-		Order newOrder = orderService.modifyOrder(customer, req);
-		return ResponseEntity.ok(newOrder);
-	}
-
+    	 String email = authentication.getName();
+         Customer customer = customerRepo.findEnabled(email)
+                 .orElseThrow(() -> new RuntimeException("Customer not found"));
+         
+         Order newOrder = orderService.modifyOrder(customer, req);
+         return ResponseEntity.ok(newOrder);
+    }
+    
 	// transactions api (creation, modifications)---------------------------
 //    
 	@PostMapping("/razorpay/order")
@@ -242,106 +242,106 @@ public class CustomerController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Payment verification failed");
 		}
 	}
-
-	// curd operations on address------------------------
-
-	@PostMapping("/address")
+    
+    // curd operations on address------------------------
+    
+    @PostMapping("/address")
 	public ResponseEntity<?> addAddress(Authentication authentication, @RequestBody AddressDTO a) {
-		String email = authentication.getName();
-		Customer customer = customerRepo.findEnabled(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
-
-		return ResponseEntity.ok(addressService.createCustomerAddress(customer, a));
-	}
-
-	@PutMapping("/address")
+    	String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        
+        return ResponseEntity.ok(addressService.createCustomerAddress(customer, a));
+    }
+    
+    @PutMapping("/address")
 	public ResponseEntity<?> modifyAddress(Authentication authentication, @RequestBody AddressDTO a) {
-
+    	
 		return ResponseEntity.ok(addressService.modifyAddress(a));
-	}
-
-	@PutMapping("/address/default")
+    }
+    
+    @PutMapping("/address/default")
 	public ResponseEntity<?> setDefaultAddress(Authentication authentication, @RequestParam Long addressId) {
-		String email = authentication.getName();
-		Customer customer = customerRepo.findEnabled(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
-		addressService.setDefaultAddress(customer.getId(), addressId);
-		return ResponseEntity.ok("Default address updated");
-	}
-
-	@DeleteMapping("/address")
+        String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        addressService.setDefaultAddress(customer.getId(), addressId);
+        return ResponseEntity.ok("Default address updated");
+    }
+    
+    @DeleteMapping("/address")
 	public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody AddressDTO a) {
-		addressService.deleteAddress(a);
-		String email = authentication.getName();
-		Customer customer = customerRepo.findEnabled(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
-		return ResponseEntity.ok(
+        addressService.deleteAddress(a);
+        String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return ResponseEntity.ok(
 				customer.getAddresses() != null ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
 						: List.of());
-	}
+    }
 
-	@GetMapping("/address")
+    @GetMapping("/address")
 	public ResponseEntity<?> getAddresses(Authentication authentication) {
-		String email = authentication.getName();
-		Customer customer = customerRepo.findEnabled(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
-		return ResponseEntity.ok(
+        String email = authentication.getName();
+        Customer customer = customerRepo.findEnabled(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return ResponseEntity.ok(
 				customer.getAddresses() != null ? customer.getAddresses().stream().filter(Address::getIsActive).toList()
 						: List.of());
-	}
-
-	// getting rider location details----------------
-
-	@GetMapping("/rider")
+    }
+    
+    // getting rider location details----------------
+    
+    @GetMapping("/rider")
 	public ResponseEntity<?> getRiderPositionDetails(Authentication authentication, @RequestBody Long oId) {
-		Order order = orderService.getOrderById(oId);
+    	Order order = orderService.getOrderById(oId);
 		Double lat = order.getDeliveryPartner().getLatitude();
 		Double lon = order.getDeliveryPartner().getLongitude();
-
-		return ResponseEntity.ok(new RiderPositionDTO(lat, lon));
-	}
-
+    	
+    	return ResponseEntity.ok(new RiderPositionDTO(lat, lon));
+    }
+    	 
 	// password change------------------------
-	@PutMapping("/password")
+    @PutMapping("/password")
 	public ResponseEntity<?> changePassword(Authentication authentication,
 			@RequestBody PasswordReqBody passwordReqBody) {
-		String email = authentication.getName();
-		Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
-
+    	String email = authentication.getName();
+        Customer customer = customerRepo.findByUsernameOrEmailOrPhone(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        
 		if (passwordEncoder.matches(passwordReqBody.oldPassword, customer.getPassword())) {
-			customer.setPassword(passwordEncoder.encode(passwordReqBody.newPassword));
-			customerRepo.save(customer);
+        	customer.setPassword(passwordEncoder.encode(passwordReqBody.newPassword));
+        	customerRepo.save(customer);
 		} else {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("wrong password. Please try again");
-		}
-
-		String jwt = jwtUtil.generateAccessTokken(customer, "CUSTOMER");
-		return ResponseEntity.ok(new JwtResponse(jwt));
-
-	}
-
+        	return ResponseEntity.status(HttpStatus.CONFLICT).body("wrong password. Please try again");
+        }
+        
+        String jwt = jwtUtil.generateAccessTokken(customer, "CUSTOMER");
+        return ResponseEntity.ok(new JwtResponse(jwt));
+    	
+    }
+    
 	// others-----------------
-
+    
 	// get restaurant details--------------------
-	@GetMapping("/restaurantAtLocation")
+    @GetMapping("/restaurantAtLocation")
 	public ResponseEntity<?> getRestaurantDetailsByLocation(@RequestParam Double lat, @RequestParam Double lon,
 			@RequestParam Double radius, @RequestParam(required = false, defaultValue = "") String searchName) {
 
 		return ResponseEntity.ok(restaurantService.findAndFilterRestaurantsByLocation(lat, lon, radius, searchName));
-	}
+    }
 
-	// get restaurant details----------------
-	@GetMapping("/restaurantDetails")
+    // get restaurant details----------------
+    @GetMapping("/restaurantDetails")
 	public ResponseEntity<?> getRestaurantDishDetails(@RequestParam Long rId) {
-
+    		
 		Restaurant r = restaurantRepo.findById(rId).orElseThrow(() -> new RuntimeException("Customer not found"));
 		Map<String, List<Dish>> dishes = r.getDishes().stream().filter(Dish::getAvailable)
 				.collect(Collectors.groupingBy(Dish::getCusine));
-		return ResponseEntity.ok(dishes);
-
-	}
-
+    	return ResponseEntity.ok(dishes);
+    	
+    }
+    
 	// request bodies
 	class PasswordReqBody {
 		public String oldPassword, newPassword;
@@ -390,14 +390,14 @@ public class CustomerController {
 			this.quantity = quantity;
 		}
 	}
-
-	class CustomerResponse {
+    
+    class CustomerResponse { 
 		public String token;
 		public CustomerDetailsDTO r;
 
-		public CustomerResponse(String t, CustomerDetailsDTO res) {
-			token = t;
+	public CustomerResponse(String t, CustomerDetailsDTO res) { 
+		token = t; 
 			r = res;
-		}
+		} 
 	}
 }

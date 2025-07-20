@@ -37,6 +37,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_partner_id", nullable = true)
+    @JsonIgnore
     private DeliveryPartner deliveryPartner;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

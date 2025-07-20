@@ -3,10 +3,11 @@ package com.excelr.FoodDelivery.Controllers;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
-import org.hibernate.id.insert.AbstractReturningDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,12 +22,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.excelr.FoodDelivery.Controllers.RestaurantController.RestaurantResponse;
 import com.excelr.FoodDelivery.Models.DeliveryPartner;
 import com.excelr.FoodDelivery.Models.Order;
-import com.excelr.FoodDelivery.Models.Restaurant;
 import com.excelr.FoodDelivery.Models.DTO.DeliveryPartnerDetailsDTO;
-import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
+import com.excelr.FoodDelivery.Models.DTO.RiderOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.RiderPositionDTO;
 import com.excelr.FoodDelivery.Models.Enum.OrderStatus;
 import com.excelr.FoodDelivery.Repositories.DeliveryPartnerRepository;
@@ -86,9 +85,10 @@ public class DeliveryPartnerController {
 	
 	// get available orders (near by 5km radius)-----------------
 	@PostMapping("/getAvailableOrders")
-	public ResponseEntity<List<Order>> getPreparingOrders(Authentication authentication, @RequestBody RiderPositionDTO position ){
-	    return ResponseEntity.ok(orderService.getPreparingOrders(position.getLat(), position.getLon()));
-	}
+public ResponseEntity<List<RiderOrderDTO>> getPreparingOrders(Authentication authentication, @RequestBody RiderPositionDTO position ){
+    List<Order> orders = orderService.getPreparingOrders(position.getLat(), position.getLon());
+    return ResponseEntity.ok(orderService.toRiderOrderDTOs(orders));
+}
 	
 	//update rider location(lat, lon)-----------------
 	@PutMapping("/updateRiderPosition")
@@ -117,9 +117,10 @@ public class DeliveryPartnerController {
 			order.setDeliveryPartner(rider);
 			order.setRiderAssigned(true);	
 			orderRepo.save(order);
-			return ResponseEntity.ok("order assigned successfully");
+			return ResponseEntity.ok(Map.of("success", true, "message", "Order assigned successfully"));
 		}
-		return ResponseEntity.ok("assignment assigned to someone! try another");
+		
+	     return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("success", false, "message", "Order already assigned! Try another."));
 	}
 	
 	
