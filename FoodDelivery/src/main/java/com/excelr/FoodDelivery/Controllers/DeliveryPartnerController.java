@@ -182,11 +182,8 @@ public ResponseEntity<List<RiderOrderDTO>> getPreparingOrders(Authentication aut
 	
 	// amount withdrawal----------------***
 	
-	
-		
-}
-
-class RiderResponse { 
+	//------------
+	class RiderResponse { 
 		public String token;
 		public DeliveryPartnerDetailsDTO r;
 	public RiderResponse(String t, DeliveryPartnerDetailsDTO res) { 
@@ -194,3 +191,7 @@ class RiderResponse {
 		r=res;
 		} 
 	}
+		
+}
+
+
