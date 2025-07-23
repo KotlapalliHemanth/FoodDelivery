@@ -18,6 +18,7 @@ import com.excelr.FoodDelivery.Models.DTO.AdminDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.DeliveryPartnerDetailsDTO;
+import com.excelr.FoodDelivery.Models.DTO.OrderDTO;
 import com.excelr.FoodDelivery.Repositories.AdminRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
@@ -176,7 +177,8 @@ public class AdminController {
     @GetMapping("/orders")
     public ResponseEntity<?> getAllOrders() {
         List<Order> orders = orderRepo.findAll();
-        return ResponseEntity.ok(orders);
+        List<OrderDTO> orderDTOs = orders.stream().map(OrderDTO::new).toList();
+        return ResponseEntity.ok(orderDTOs);
     }
 
     // 9. Get order details

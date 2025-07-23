@@ -14,4 +14,9 @@ public class RestaurantDetailsAndAddressDTO {
 		this.rDto= new RestaurantDetailsDTO(res);
 		this.aDto= new AddressDTO(ad);
 	}
+	
+	public RestaurantDetailsAndAddressDTO (Restaurant res) {
+		this.rDto= new RestaurantDetailsDTO(res);
+		this.aDto= new AddressDTO(res.getAddresses());
+	}
 }
