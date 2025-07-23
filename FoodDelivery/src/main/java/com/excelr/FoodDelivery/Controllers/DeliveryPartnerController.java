@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,7 @@ import com.excelr.FoodDelivery.Models.Order;
 import com.excelr.FoodDelivery.Models.DTO.DeliveryPartnerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.RiderOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.RiderPositionDTO;
+import com.excelr.FoodDelivery.Models.DTO.OrderDetailsDTO;
 import com.excelr.FoodDelivery.Models.Enum.OrderStatus;
 import com.excelr.FoodDelivery.Repositories.DeliveryPartnerRepository;
 import com.excelr.FoodDelivery.Repositories.OrderRepository;
@@ -125,7 +127,7 @@ public ResponseEntity<List<RiderOrderDTO>> getPreparingOrders(Authentication aut
 	
 	
 	// my assigned order--------------------
-	@GetMapping()
+	@GetMapping("/acceptedOrderDetails")
 	public ResponseEntity<List<Order>> assignedOrder (Authentication authentication){
 		String email = authentication.getName();
         DeliveryPartner rider = riderRepo.findEnabled(email)
@@ -133,6 +135,12 @@ public ResponseEntity<List<RiderOrderDTO>> getPreparingOrders(Authentication aut
         
         return ResponseEntity.ok(orderRepo.findPreparingOrdersByDeliveryPartnerId(rider.getId()));
 	}
+
+    @GetMapping("/acceptedOrderDetails/{orderId}")
+    public ResponseEntity<OrderDetailsDTO> acceptedOrderDetails(@PathVariable Long orderId) {
+        Order order = orderService.getOrderById(orderId);
+        return ResponseEntity.ok(orderService.toOrderDetailsDTO(order));
+    }
 	
 	// order delivery status change(picked the order)-----------------
 	@PutMapping("/orderPickup")
@@ -141,6 +149,7 @@ public ResponseEntity<List<RiderOrderDTO>> getPreparingOrders(Authentication aut
 				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
 		
 		order.setStatus(OrderStatus.ON_THE_WAY);
+		order.setUpdatedAt(LocalDateTime.now());
 		orderRepo.save(order);
 		return ResponseEntity.ok(orderRepo.save(order));
 	}
@@ -152,6 +161,8 @@ public ResponseEntity<List<RiderOrderDTO>> getPreparingOrders(Authentication aut
 				.orElseThrow(() -> new RuntimeException("Order not found with id: " + oId));
 		
 		order.setStatus(OrderStatus.DELIVERED);
+		order.setDeliveredAt(LocalDateTime.now());
+		order.setUpdatedAt(LocalDateTime.now());
 		orderRepo.save(order);
 		// if possible add the mailing to user about order with details----------------
 		return ResponseEntity.ok(orderRepo.save(order));

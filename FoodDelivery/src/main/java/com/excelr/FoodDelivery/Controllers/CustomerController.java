@@ -130,18 +130,22 @@ public class CustomerController {
 			List<DishWithQuantityDTO> dishWithQuantities = order.getOrderDishes().stream()
 				.map(od -> new DishWithQuantityDTO(od.getDish(), od.getQuantity()))
 				.collect(Collectors.toList());
+			RiderDTO riderDTO = null;
+			if (order.getDeliveryPartner() != null) {
+				riderDTO = new RiderDTO(order.getDeliveryPartner());
+			}
 			try {
 				if (order.getOrderDishes() != null && !order.getOrderDishes().isEmpty()) {
 					Long firstDishId = order.getOrderDishes().get(0).getDish().getId();
 					restaurantDetails = dishService.findRestaurant(firstDishId);
-					return new OrderWithRestaurantDTO(order, restaurantDetails, dishWithQuantities);
+					return new OrderWithRestaurantDTO(order, restaurantDetails, dishWithQuantities, riderDTO);
 				} else {
-					return new OrderWithRestaurantDTO(order, "No dishes found in order", dishWithQuantities);
+					return new OrderWithRestaurantDTO(order, "No dishes found in order", dishWithQuantities, riderDTO);
 				}
 			} catch (Exception e) {
 				// Log the error and return a DTO with the error message
 				e.printStackTrace();
-				return new OrderWithRestaurantDTO(order, "Failed to fetch restaurant details: " + e.getMessage(), dishWithQuantities);
+				return new OrderWithRestaurantDTO(order, "Failed to fetch restaurant details: " + e.getMessage(), dishWithQuantities, riderDTO);
     }
 		}).collect(Collectors.toList());
 		return ResponseEntity.ok(result);
@@ -352,18 +356,21 @@ public class CustomerController {
 		public RestaurantDetailsAndAddressDTO restaurantDetails;
 		public String errorMessage;
 		public List<DishWithQuantityDTO> dishes;
+		public RiderDTO rider; // <-- Add this
 
-		public OrderWithRestaurantDTO(Order order, RestaurantDetailsAndAddressDTO restaurantDetails, List<DishWithQuantityDTO> dishes) {
+		public OrderWithRestaurantDTO(Order order, RestaurantDetailsAndAddressDTO restaurantDetails, List<DishWithQuantityDTO> dishes, RiderDTO rider) {
 			this.order = order;
 			this.restaurantDetails = restaurantDetails;
 			this.errorMessage = null;
 			this.dishes = dishes;
+			this.rider = rider;
 		}
-		public OrderWithRestaurantDTO(Order order, String errorMessage, List<DishWithQuantityDTO> dishes) {
+		public OrderWithRestaurantDTO(Order order, String errorMessage, List<DishWithQuantityDTO> dishes, RiderDTO rider) {
 			this.order = order;
 			this.restaurantDetails = null;
 			this.errorMessage = errorMessage;
 			this.dishes = dishes;
+			this.rider = rider;
 		}
 	}
 
@@ -388,6 +395,27 @@ public class CustomerController {
 			this.available = dish.getAvailable();
 			this.image = dish.getImage();
 			this.quantity = quantity;
+		}
+	}
+    
+    // Add RiderDTO for rider details in order response
+    public static class RiderDTO {
+        public Long id;
+        public String username;
+        public String email;
+        public String phone;
+        public String profilePic;
+        public Double latitude;
+        public Double longitude;
+
+        public RiderDTO(com.excelr.FoodDelivery.Models.DeliveryPartner rider) {
+            this.id = rider.getId();
+            this.username = rider.getUsername();
+            this.email = rider.getEmail();
+            this.phone = rider.getPhone();
+            this.profilePic = rider.getProfilePic();
+            this.latitude = rider.getLatitude();
+            this.longitude = rider.getLongitude();
 		}
 	}
     

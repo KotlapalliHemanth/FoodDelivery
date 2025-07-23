@@ -16,6 +16,7 @@ import com.excelr.FoodDelivery.Models.Transaction;
 import com.excelr.FoodDelivery.Models.DTO.CreateOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.ModifyOrderDTO;
 import com.excelr.FoodDelivery.Models.DTO.RiderOrderDTO;
+import com.excelr.FoodDelivery.Models.DTO.OrderDetailsDTO;
 import com.excelr.FoodDelivery.Models.Enum.OrderStatus;
 import com.excelr.FoodDelivery.Models.Enum.PaymentStatus;
 import com.excelr.FoodDelivery.Repositories.AddressRepository;
@@ -178,7 +179,6 @@ public class OrderService {
             dto.amount = order.getAmount();
             dto.status = order.getStatus().toString();
             dto.riderAssigned = order.getRiderAssigned();
-            dto.instructions = ""; // set if you have this field
             dto.createdAt = order.getCreatedAt() != null ? order.getCreatedAt().toString() : null;
 
             // Restaurant info (assuming all dishes are from the same restaurant)
@@ -212,6 +212,62 @@ public class OrderService {
 
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    public OrderDetailsDTO toOrderDetailsDTO(Order order) {
+        OrderDetailsDTO dto = new OrderDetailsDTO();
+        dto.orderId = order.getId();
+        dto.status = order.getStatus() != null ? order.getStatus().toString() : null;
+        dto.orderTime = order.getCreatedAt() != null ? order.getCreatedAt().toString() : null;
+        dto.amount = order.getAmount();
+        dto.instructions = null; // No getInstructions() on Order; set to null or add field if needed
+        dto.paymentStatus = order.getTransaction() != null && order.getTransaction().getStatus() != null ? order.getTransaction().getStatus().toString() : null;
+		dto.paymentType = order.getTransaction() != null && order.getTransaction().getTypeOfPay() != null ? order.getTransaction().getTypeOfPay().toString() : null;
+        dto.deliveredAt = order.getDeliveredAt() != null ? order.getDeliveredAt().toString() : null;
+        dto.pickedUpAt = null; // No getPickedUpAt() on Order; set to null or add field if needed
+
+        // Restaurant info (from first dish)
+        if (order.getOrderDishes() != null && !order.getOrderDishes().isEmpty()) {
+            Dish firstDish = order.getOrderDishes().get(0).getDish();
+            Restaurant restaurant = firstDish.getRestaurant();
+            OrderDetailsDTO.RestaurantInfo restInfo = new OrderDetailsDTO.RestaurantInfo();
+            restInfo.name = restaurant.getRestaurantName();
+            restInfo.phone = restaurant.getPhone();
+            restInfo.img = restaurant.getResturantPic();
+            Address restAddr = restaurant.getAddresses();
+            restInfo.address = restAddr != null ? restAddr.getFulladdress() : null;
+            OrderDetailsDTO.Location restLoc = new OrderDetailsDTO.Location();
+            restLoc.lat = restAddr != null ? restAddr.getLatitude() : null;
+            restLoc.lng = restAddr != null ? restAddr.getLongitude() : null;
+            restInfo.location = restLoc;
+            dto.restaurant = restInfo;
+        }
+
+        // Customer info
+        Customer customer = order.getCustomer();
+        OrderDetailsDTO.CustomerInfo custInfo = new OrderDetailsDTO.CustomerInfo();
+        custInfo.name = customer.getFirstName() + " " + customer.getLastName();
+        Address custAddr = customer.getAddresses().stream().filter(Address::getIsActive).findFirst().orElse(null);
+        custInfo.address = custAddr != null ? custAddr.getFulladdress() : null;
+        OrderDetailsDTO.Location custLoc = new OrderDetailsDTO.Location();
+        custLoc.lat = custAddr != null ? custAddr.getLatitude() : null;
+        custLoc.lng = custAddr != null ? custAddr.getLongitude() : null;
+        custInfo.location = custLoc;
+        custInfo.phone = customer.getPhone();
+        dto.customer = custInfo;
+
+        // Dishes
+        dto.dishes = order.getOrderDishes().stream().map(od -> {
+            OrderDetailsDTO.DishInfo d = new OrderDetailsDTO.DishInfo();
+            d.dishId = od.getDish().getId();
+            d.name = od.getDish().getName();
+            d.quantity = od.getQuantity();
+            d.price = od.getDish().getPrice();
+            d.img = od.getDish().getImage();
+            return d;
+        }).collect(Collectors.toList());
+
+        return dto;
     }
 
 }

@@ -7,7 +7,6 @@ public class RiderOrderDTO {
     public Double amount;
     public String status;
     public Boolean riderAssigned;
-    public String instructions;
     public String createdAt;
     public RestaurantInfo restaurant;
     public List<DishWithQuantityDTO> dishes;
