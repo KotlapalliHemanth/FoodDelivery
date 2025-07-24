@@ -19,6 +19,7 @@ import com.excelr.FoodDelivery.Models.DTO.CustomerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.DeliveryPartnerDetailsDTO;
 import com.excelr.FoodDelivery.Models.DTO.OrderDTO;
+import com.excelr.FoodDelivery.Models.DTO.RestaurantDetailsAndAddressDTO;
 import com.excelr.FoodDelivery.Repositories.AdminRepository;
 import com.excelr.FoodDelivery.Repositories.CustomerRepository;
 import com.excelr.FoodDelivery.Repositories.RestaurantRepository;
@@ -69,7 +70,7 @@ public class AdminController {
     @GetMapping("/restaurants")
     public ResponseEntity<?> getAllRestaurants() {
         List<Restaurant> restaurants = restaurantRepo.findAll();
-        List<RestaurantDetailsDTO> dtos = restaurants.stream().map(RestaurantDetailsDTO::new).toList();
+        List<RestaurantDetailsAndAddressDTO> dtos = restaurants.stream().map(RestaurantDetailsAndAddressDTO::new).toList();
         return ResponseEntity.ok(dtos);
     }
 
