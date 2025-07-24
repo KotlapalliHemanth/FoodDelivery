@@ -3,7 +3,9 @@ package com.excelr.FoodDelivery.Models;
 import java.time.LocalDateTime;
 
 import com.excelr.FoodDelivery.Models.Enum.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -32,12 +34,12 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_partner_id", nullable = true)
-    @JsonIgnore
+    @JsonBackReference
     private DeliveryPartner deliveryPartner;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

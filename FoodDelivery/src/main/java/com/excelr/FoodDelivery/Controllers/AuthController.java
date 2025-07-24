@@ -162,7 +162,7 @@ public class AuthController {
                 return ResponseEntity.badRequest().body("Invalid userType");
             }
         }
-
+        System.out.println(user);
         String jwt = jwtUtil.generateAccessTokken(user, role);
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
